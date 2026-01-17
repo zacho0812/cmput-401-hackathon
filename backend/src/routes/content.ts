@@ -73,9 +73,17 @@ router.patch("/api/:userId/resume/:resumeId/save", async (req, res) => {
 });
 
 router.get("/api/logs/:id", (req, res) => {
-
-
-
+    const jobId = req.params.jobid;
+    try {
+        const logs = await prisma.log.findMany({
+            where: { jobid: jobId },
+            orderBy: { id: 'asc' } // or another order if needed
+        });
+        res.json(logs);
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: "Failed to fetch logs" });
+    }
 });
 
 router.post("/api/logs/:id", (req, res) => {
