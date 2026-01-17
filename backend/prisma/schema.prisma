@@ -5,6 +5,7 @@ generator client {
 
 datasource db {
   provider = "postgresql"
+  url      = env("DATABASE_URL")
 }
 
 enum JobStatus {
@@ -27,9 +28,9 @@ model User{
 
 model Job{
   id String @id @default(uuid()) 
-  user User @relation(fields: [userid], references: [id],onDelete: Cascade)
+  user User @relation(fields: [userid], references: [id], onDelete: Cascade)
   userid String 
-  Logs Log[]
+  logs Log[]
   companyName String
   positiontTitle String
   status JobStatus @default(SAVED)
