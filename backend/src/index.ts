@@ -1,5 +1,5 @@
 import express from "express"
-import Content from "./routes/auth.js"
+import Content from "./routes/content.js"
 
 const app = express()
 app.use(Content)
