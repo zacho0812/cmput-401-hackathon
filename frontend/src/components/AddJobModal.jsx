@@ -1,62 +1,61 @@
-import { useEffect, useState } from 'react'
-
-function todayYYYYMMDD() {
-  return new Date().toISOString().slice(0, 10)
-}
+import { useEffect, useMemo, useState } from 'react'
 
 export default function AddJobModal({
   open,
   onClose,
 
-  // add mode
-  onAdd,
+  // For compatibility with your existing code:
+  onAdd,     // used when adding
+  onSave,    // optional, used when editing
 
-  // edit mode
-  mode = 'add',         // 'add' or 'edit'
-  initialJob = null,    // job to edit
-  onSave,               // save edited job
+  // When you pass a job here, the modal becomes "Edit" mode
+  initialJob = null,
 }) {
+  const isEdit = !!initialJob
+
+  const submitFn = useMemo(() => {
+    // Prefer onSave in edit mode, else fall back to onAdd
+    if (isEdit) return onSave || onAdd
+    return onAdd
+  }, [isEdit, onAdd, onSave])
+
+  const todayStr = useMemo(() => {
+    const d = new Date()
+    const yyyy = d.getFullYear()
+    const mm = String(d.getMonth() + 1).padStart(2, '0')
+    const dd = String(d.getDate()).padStart(2, '0')
+    return `${yyyy}-${mm}-${dd}`
+  }, [])
+
   const [position, setPosition] = useState('')
   const [company, setCompany] = useState('')
   const [location, setLocation] = useState('')
-  const [dateApplied, setDateApplied] = useState(todayYYYYMMDD())
-  const [status, setStatus] = useState('Not Applied')
+  const [dateApplied, setDateApplied] = useState(todayStr)
   const [notes, setNotes] = useState('')
+  const [status, setStatus] = useState('Not Applied')
 
-  // When modal opens, set fields:
+  // Reset / prefill form whenever modal opens OR initialJob changes
   useEffect(() => {
     if (!open) return
 
-    if (mode === 'edit' && initialJob) {
+    if (initialJob) {
       setPosition(initialJob.position || '')
       setCompany(initialJob.company || '')
       setLocation(initialJob.location || '')
-      setDateApplied(initialJob.dateApplied || todayYYYYMMDD())
-      setStatus(initialJob.status || 'Not Applied')
+      setDateApplied(initialJob.dateApplied || todayStr)
       setNotes(initialJob.notes || '')
+      setStatus(initialJob.status || 'Not Applied')
     } else {
-      // add mode reset
       setPosition('')
       setCompany('')
       setLocation('')
-      setDateApplied(todayYYYYMMDD())
-      setStatus('Not Applied')
+      setDateApplied(todayStr)
       setNotes('')
+      setStatus('Not Applied')
     }
-  }, [open, mode, initialJob])
+  }, [open, initialJob, todayStr])
 
   if (!open) return null
-
-  const inputStyle = {
-    width: '100%',
-    boxSizing: 'border-box',
-    padding: 10,
-    borderRadius: 12,
-    border: '1px solid #d8d8d8',
-    outline: 'none',
-    background: 'white',
-    fontSize: 18,
-  }
 
   function handleSubmit(e) {
     e.preventDefault()
@@ -66,33 +65,24 @@ export default function AddJobModal({
       return
     }
 
-    if (mode === 'edit') {
-      const updated = {
-        ...initialJob,
-        position: position.trim(),
-        company: company.trim(),
-        location: location.trim(),
-        dateApplied: dateApplied || '',
-        status,
-        notes: notes.trim(),
-      }
-      onSave(updated)
-      onClose()
+    if (!submitFn) {
+      // If you haven’t wired the handler yet, just close
+      onClose?.()
       return
     }
 
-    // add mode
-    const newJob = {
-      id: Date.now(),
+    const jobToSubmit = {
+      id: initialJob?.id ?? Date.now(),
       position: position.trim(),
       company: company.trim(),
       location: location.trim(),
-      dateApplied: dateApplied || '',
+      dateApplied: dateApplied || todayStr,
+      notes: notes, // keep spaces + multi-line (don’t trim hard)
       status,
-      notes: notes.trim(),
     }
-    onAdd(newJob)
-    onClose()
+
+    submitFn(jobToSubmit)
+    onClose?.()
   }
 
   return (
@@ -114,58 +104,57 @@ export default function AddJobModal({
         style={{
           background: 'white',
           width: '100%',
-          maxWidth: 650,
-          borderRadius: 16,
-          padding: 18,
+          maxWidth: 520,
+          borderRadius: 14,
+          padding: 16,
           border: '1px solid #eee',
         }}
       >
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-          <div style={{ fontSize: 36, fontWeight: 900 }}>
-            {mode === 'edit' ? 'Edit Job' : 'Add Job'}
-          </div>
+          <div style={{ fontSize: 18, fontWeight: 900 }}>{isEdit ? 'Edit Job' : 'Add Job'}</div>
           <button
             onClick={onClose}
-            style={{ border: 'none', background: 'transparent', fontSize: 30, cursor: 'pointer' }}
+            style={{ border: 'none', background: 'transparent', fontSize: 18, cursor: 'pointer' }}
             aria-label="Close"
+            type="button"
           >
             ✕
           </button>
         </div>
 
-        <form onSubmit={handleSubmit} style={{ marginTop: 10, display: 'flex', flexDirection: 'column', gap: 16 }}>
+        <form onSubmit={handleSubmit} style={{ marginTop: 12, display: 'flex', flexDirection: 'column', gap: 10 }}>
           <label>
-            <div style={{ fontSize: 32, fontWeight: 900 }}>Position *</div>
+            <div style={{ fontWeight: 700, marginBottom: 4 }}>Position *</div>
             <input
-              placeholder="e.g., SWE Intern"
               value={position}
               onChange={(e) => setPosition(e.target.value)}
               style={inputStyle}
+              placeholder="e.g., SWE Intern"
             />
           </label>
 
           <label>
-            <div style={{ fontSize: 32, fontWeight: 900 }}>Company *</div>
+            <div style={{ fontWeight: 700, marginBottom: 4 }}>Company *</div>
             <input
-              placeholder="e.g., Google"
               value={company}
               onChange={(e) => setCompany(e.target.value)}
               style={inputStyle}
+              placeholder="e.g., Google"
             />
           </label>
 
           <label>
-            <div style={{ fontSize: 32, fontWeight: 900 }}>Location</div>
+            <div style={{ fontWeight: 700, marginBottom: 4 }}>Location</div>
             <input
-              placeholder="e.g., Toronto / Remote"
               value={location}
               onChange={(e) => setLocation(e.target.value)}
               style={inputStyle}
+              placeholder="e.g., Toronto / Remote"
             />
           </label>
 
           <label>
-            <div style={{ fontSize: 32, fontWeight: 900 }}>Date Applied</div>
+            <div style={{ fontWeight: 700, marginBottom: 4 }}>Date Applied</div>
             <input
               type="date"
               value={dateApplied}
@@ -174,19 +163,8 @@ export default function AddJobModal({
             />
           </label>
 
-          {/*  Deadline (real date picker) */}
           <label>
-            <div style={{ fontWeight: 700, marginBottom: 4 }}>Deadline</div>
-            <input
-              type="date"
-              value={deadline}
-              onChange={(e) => setDeadline(e.target.value)}
-              style={inputStyle}
-            />
-          </label>
-
-          <label>
-            <div style={{ fontSize: 32, fontWeight: 900 }}>Status</div>
+            <div style={{ fontWeight: 700, marginBottom: 4 }}>Status</div>
             <select value={status} onChange={(e) => setStatus(e.target.value)} style={inputStyle}>
               <option>Not Applied</option>
               <option>Applied</option>
@@ -198,51 +176,53 @@ export default function AddJobModal({
           </label>
 
           <label>
-            <div style={{ fontSize: 32, fontWeight: 900 }}>Notes</div>
+            <div style={{ fontWeight: 700, marginBottom: 4 }}>Notes</div>
             <textarea
-              placeholder="Anything important..."
               value={notes}
               onChange={(e) => setNotes(e.target.value)}
-              style={{ ...inputStyle, height: 150, resize: 'vertical' }}
+              style={{ ...inputStyle, height: 110, resize: 'vertical' }}
+              placeholder="Anything important..."
             />
           </label>
 
-          <div style={{ display: 'flex', gap: 14, justifyContent: 'flex-end', marginTop: 8 }}>
-            <button
-              type="button"
-              onClick={onClose}
-              style={{
-                padding: '12px 18px',
-                borderRadius: 14,
-                border: '2px solid #ddd',
-                background: 'white',
-                fontWeight: 900,
-                fontSize: 20,
-                cursor: 'pointer',
-              }}
-            >
+          <div style={{ display: 'flex', gap: 10, justifyContent: 'flex-end', marginTop: 6 }}>
+            <button type="button" onClick={onClose} style={secondaryBtn}>
               Cancel
             </button>
-
-            {/* ✅ Add mode: "Add"  |  Edit mode: "Save" */}
-            <button
-              type="submit"
-              style={{
-                padding: '12px 18px',
-                borderRadius: 14,
-                border: '2px solid #111',
-                background: '#111',
-                color: 'white',
-                fontWeight: 900,
-                fontSize: 20,
-                cursor: 'pointer',
-              }}
-            >
-              {mode === 'edit' ? 'Save' : 'Add'}
+            <button type="submit" style={primaryBtn}>
+              {isEdit ? 'Save' : 'Add'}
             </button>
           </div>
         </form>
       </div>
     </div>
   )
+}
+
+const inputStyle = {
+  width: '100%',
+  boxSizing: 'border-box',
+  padding: 10,
+  borderRadius: 10,
+  border: '1px solid #ddd',
+  outline: 'none',
+}
+
+const primaryBtn = {
+  padding: '10px 14px',
+  borderRadius: 10,
+  border: '1px solid #111',
+  background: '#111',
+  color: 'white',
+  fontWeight: 800,
+  cursor: 'pointer',
+}
+
+const secondaryBtn = {
+  padding: '10px 14px',
+  borderRadius: 10,
+  border: '1px solid #ddd',
+  background: 'white',
+  fontWeight: 800,
+  cursor: 'pointer',
 }
