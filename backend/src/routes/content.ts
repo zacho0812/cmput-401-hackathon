@@ -48,7 +48,7 @@ router.post(`/api/:userId/resume/:resumeId/add`, async (req, res) => {
 
     const result = await prisma.resume.create({
     data:{
-        id:req.params["userId"],
+        id:req.params["resumeId"],
         userid:req.params["userId"],
         data:resume_data
     }
@@ -59,14 +59,24 @@ router.post(`/api/:userId/resume/:resumeId/add`, async (req, res) => {
 
 
 router.patch("/api/:userId/resume/:resumeId/save", async (req, res) => {
-    const resume_data = req.body
+    const {resume_data} = req.body
 
     const result = await prisma.resume.update({
-        where: {id:req.params["userId"]},
+        where: {id:req.params["resumeId"]},
         data:{
             userid:req.params["userId"],
             data:resume_data
         },
+    })
+    res.json(result)
+
+});
+
+
+router.delete("/api/:userId/resume/:resumeId/delete", async (req, res) => {
+
+    const result = await prisma.resume.delete({
+        where: {id:req.params["resumeId"]},
     })
     res.json(result)
 
