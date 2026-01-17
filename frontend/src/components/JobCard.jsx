@@ -8,7 +8,13 @@ const STATUS_ORDER = {
 }
 
 function badgeStyle(status) {
-  const base = { padding: '4px 10px', borderRadius: 999, fontSize: 12, fontWeight: 700, display: 'inline-block' }
+  const base = {
+    padding: '4px 10px',
+    borderRadius: 999,
+    fontSize: 12,
+    fontWeight: 700,
+    display: 'inline-block',
+  }
   if (status === 'Applied') return { ...base, background: '#d8f5d8' }
   if (status === 'Interview') return { ...base, background: '#fff3bf' }
   if (status === 'Offer') return { ...base, background: '#dbeafe' }
@@ -21,24 +27,31 @@ export function sortJobsForAppliedBox(jobs) {
   return [...jobs].sort((a, b) => (STATUS_ORDER[a.status] ?? 99) - (STATUS_ORDER[b.status] ?? 99))
 }
 
-export default function JobCard({ job, onChangeStatus }) {
+export default function JobCard({ job, onChangeStatus, onEdit, onDelete }) {
   return (
-    <div style={{
-      border: '1px solid #eee',
-      borderRadius: 12,
-      padding: 12,
-      display: 'flex',
-      justifyContent: 'space-between',
-      gap: 12,
-      alignItems: 'center'
-    }}>
-      <div style={{ flex: 1 }}>
+    <div
+      onClick={() => onEdit?.(job)}
+      style={{
+        border: '1px solid #eee',
+        borderRadius: 12,
+        padding: 12,
+        display: 'flex',
+        justifyContent: 'space-between',
+        gap: 12,
+        alignItems: 'center',
+        cursor: 'pointer',
+      }}
+      role="button"
+      tabIndex={0}
+    >
+      <div style={{ flex: 1, minWidth: 0 }}>
         <div style={{ fontWeight: 800 }}>{job.position}</div>
         <div style={{ color: '#444', marginTop: 2 }}>
-          {job.company} • {job.location}
+          {job.company}
+          {job.location ? <> • {job.location}</> : null}
         </div>
         <div style={{ color: '#666', marginTop: 6 }}>
-          Date Applied: {job.dateApplied || 'N/A'} • Notes: {job.notes || ''}
+          Date Applied: {job.dateApplied || 'N/A'}
           {job.notes ? <> • Notes: {job.notes}</> : null}
         </div>
       </div>
@@ -48,8 +61,9 @@ export default function JobCard({ job, onChangeStatus }) {
 
         <select
           value={job.status}
+          onClick={(e) => e.stopPropagation()}
           onChange={(e) => onChangeStatus(job.id, e.target.value)}
-          style={{ padding: 8, borderRadius: 8, border: '1px solid #ddd' }}
+          style={{ padding: 8, borderRadius: 8, border: '1px solid #ddd', cursor: 'pointer' }}
         >
           <option>Not Applied</option>
           <option>Applied</option>
@@ -58,6 +72,23 @@ export default function JobCard({ job, onChangeStatus }) {
           <option>Accepted</option>
           <option>Rejected</option>
         </select>
+
+        <button
+          onClick={(e) => {
+            e.stopPropagation()
+            onDelete?.(job.id)
+          }}
+          style={{
+            padding: '8px 10px',
+            borderRadius: 10,
+            border: '1px solid #f3b4b4',
+            background: '#fff5f5',
+            fontWeight: 800,
+            cursor: 'pointer',
+          }}
+        >
+          Delete
+        </button>
       </div>
     </div>
   )
