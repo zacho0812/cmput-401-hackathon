@@ -38,7 +38,7 @@ export default function JobCard({ job, onChangeStatus }) {
           {job.company} • {job.location}
         </div>
         <div style={{ color: '#666', marginTop: 6 }}>
-          Date Applied: {job.dateApplied || 'N/A'} • Notes: {job.notes || ''}
+          Deadline: {job.deadline || 'N/A'} Date Applied: {job.dateApplied || 'N/A'} • Notes: {job.notes || ''}
           {job.notes ? <> • Notes: {job.notes}</> : null}
         </div>
       </div>
