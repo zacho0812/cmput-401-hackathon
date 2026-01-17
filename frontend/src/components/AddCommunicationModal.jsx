@@ -1,17 +1,28 @@
 import { useEffect, useState } from 'react'
 
-export default function AddCommunicationModal({ open, onClose, onAdd }) {
+export default function AddCommunicationModal({
+  open,
+  onClose,
+  onSave,
+  communication,
+}) {
   const [type, setType] = useState('Email')
   const [contact, setContact] = useState('')
   const [notes, setNotes] = useState('')
 
   useEffect(() => {
     if (open) {
-      setType('Email')
-      setContact('')
-      setNotes('')
+      if (communication) {
+        setType(communication.type)
+        setContact(communication.contact)
+        setNotes(communication.notes)
+      } else {
+        setType('Email')
+        setContact('')
+        setNotes('')
+      }
     }
-  }, [open])
+  }, [open, communication])
 
   if (!open) return null
 
@@ -23,12 +34,12 @@ export default function AddCommunicationModal({ open, onClose, onAdd }) {
       return
     }
 
-    onAdd({
-      id: Date.now(),
+    onSave({
+      id: communication?.id ?? Date.now(),
       type,
       contact: contact.trim(),
       notes: notes.trim(),
-      time: new Date().toLocaleString(),
+      time: communication?.time ?? new Date().toLocaleString(),
     })
 
     onClose()
@@ -38,7 +49,9 @@ export default function AddCommunicationModal({ open, onClose, onAdd }) {
     <div onClick={onClose} style={overlay}>
       <div onClick={(e) => e.stopPropagation()} style={modal}>
         <div style={header}>
-          <div style={{ fontSize: 18, fontWeight: 900 }}>Add Communication</div>
+          <div style={{ fontSize: 18, fontWeight: 900 }}>
+            {communication ? 'Edit Communication' : 'Add Communication'}
+          </div>
           <button onClick={onClose} style={closeBtn} aria-label="Close">
             ✕
           </button>
@@ -47,10 +60,14 @@ export default function AddCommunicationModal({ open, onClose, onAdd }) {
         <form onSubmit={handleSubmit} style={form}>
           <label>
             <div style={label}>Type</div>
-            <select value={type} onChange={(e) => setType(e.target.value)} style={input}>
+            <select
+              value={type}
+              onChange={(e) => setType(e.target.value)}
+              style={input}
+            >
               <option>Email</option>
               <option>Phone</option>
-              <option>Interview</option>
+              <option>In Person</option>
               <option>LinkedIn</option>
               <option>Other</option>
             </select>
@@ -81,7 +98,7 @@ export default function AddCommunicationModal({ open, onClose, onAdd }) {
               Cancel
             </button>
             <button type="submit" style={primaryBtn}>
-              Add
+              {communication ? 'Save Changes' : 'Add'}
             </button>
           </div>
         </form>
