@@ -1,18 +1,27 @@
 import { Router } from "express";
 import { PrismaClient } from "@prisma/client";
-const prisma = new PrismaClient();
 const router = Router();
-router.get("/api/listings", async (req, res) => {
-    await prisma.user.create({
-        data: {
-            username: "karan1",
-            password: "brar1"
-        }
+const prisma = new PrismaClient();
+router.get("/api/listings", (req, res) => {
+    prisma.user.create({
+        data: { username: "user12", password: "pass12" }
     });
 });
 router.post("/api/listings", (req, res) => {
 });
-router.get("/api/listings", (req, res) => {
+router.patch("/api/listings/:id", (req, res) => {
+});
+router.delete("/api/listings/:id", (req, res) => {
+});
+router.get("/api/resume", (req, res) => {
+});
+router.patch("/api/resume", (req, res) => {
+});
+router.get("/api/logs/:id", (req, res) => {
+});
+router.post("/api/logs/:id", (req, res) => {
+});
+router.delete("/api/logs/:id", (req, res) => {
 });
 export default router;
 //# sourceMappingURL=content.js.map
