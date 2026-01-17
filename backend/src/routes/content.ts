@@ -1,128 +1,326 @@
 import { Router } from "express";
 import {PrismaClient} from "@prisma/client"
+import { da } from "zod/locales";
 
 const router = Router();
 
 const prisma = new PrismaClient()
 
-router.get("/api/listings", (req, res) => {
-    
+router.get("/api/jobs", async (req, res) => {
+    try{
+        let user = req.header("user-id");
+        if(!user){
+            return res.status(400).json({
+            message:"required data not provided"
+        })
+
+        }
+
+        let listings = await prisma.user.findMany({
+            where:{
+               id:user
+            },
+            include:{
+                jobs:true
+            }
+        }) 
+
+        return res.status(200).json({
+            data:listings
+
+        })
+
+        
+
+    } catch(err){
+        return res.status(500).json({
+            message:"server error"
+        })
+    }
+
+});
+
+router.post("/api/jobs", async (req, res) => {
+    try{
+        let user = req.header("user-id");
+        if(!user || !req.body.positionTitle ||!req.body.companyName ){
+            return res.status(400).json({
+            message:"required data not provided"
+        })
+
+        }
+
+        const job = await prisma.job.create({
+            data:{
+                userid:user,
+                positiontTitle:req.body.positionTitle,
+                companyName:req.body.companyName,
+                dateapplied:req.body.dateapplied? req.body.dateapplied:null,
+                location: req.body.location?req.body.location:null,
+                deadline: req.body.deadline?req.body.deadline:null,
+                notes: req.body.notes?req.body.notes:null
+            }
+        })    
+        return res.status(200).json({
+            id:job.id,
+            message:"job created succesfully"
+        })
+
+    }
+    catch(err){
+        return res.status(500).json({
+            message:"server error"
+        })
+    }
+
+
 
 
 });
 
-router.post("/api/listings", (req, res) => {
+router.patch("/api/jobs", async (req, res) => {
+    try{
+        let user = req.header("user-id");
+        if(!user || !req.body.positionTitle ||!req.body.companyName || !req.body.jobid){
+            return res.status(400).json({
+            message:"required data not provided"
+        })
+
+        }
+
+        await prisma.job.update({
+            where:{id:req.body.jobid},
+            data:{
+                userid:user,
+                positiontTitle:req.body.positionTitle,
+                companyName:req.body.companyName,
+                dateapplied:req.body.dateapplied? req.body.dateapplied:null,
+                location: req.body.location?req.body.location:null,
+                deadline: req.body.deadline?req.body.deadline:null,
+                notes: req.body.notes?req.body.notes:null
+            }
+        })    
+
+         return res.status(200).json({
+            message:"job updated succesfully"
+        })
+
+    }
+    catch(err){
+        return res.status(500).json({
+            message:"server error"
+        })
+    }
 
 
 });
 
-router.patch("/api/listings/:id", (req, res) => {
+router.delete("/api/jobs", async (req, res) => {
+    try{
+         let user = req.header("user-id");
+        if(!user || !req.body.id){
+            return res.status(400).json({
+            message:"required data not provided"
+        })
 
+        }
 
-});
-
-router.delete("/api/listings/:id", (req, res) => {
+        await prisma.job.delete({
+            where:{
+                id:req.body.id
+            }
+        })
+        
+        return res.status(200).json({
+            message:"job deleted succesfully"
+        })
+    }
+    catch(err){
+        return res.status(500).json({
+            message:"server error"
+        })
+    }
 
 
 });
 
 router.get("/api/resume", async (req, res) => {
-    const resumes = await prisma.resume.findMany({
-        where: {}
-    })
-    res.json(resumes)
+    try{
+        let user = req.header("user-id");
+        if(!user){
+            return res.status(400).json({
+            message:"required data not provided"
+        })
 
-});
+        }
 
-router.get("/api/:userId/resume", async (req, res) => {
-    const resumes = await prisma.resume.findMany({
-        where: { userid: req.params["userId"] }
-    })
-    console.log(resumes)
-    res.json(resumes)
-});
+        const data = await prisma.resume.findFirst({
+            where:{
+                userid:user
+            }
+        })
 
+        return res.status(200).json({
+            data:data?.data,
+            message:"resume fetched succesfully"
+        })
 
-router.post(`/api/:userId/resume/:resumeId/add`, async (req, res) => {
-    const { resume_data } = req.body
-
-    const result = await prisma.resume.create({
-    data:{
-        id:req.params["userId"],
-        userid:req.params["userId"],
-        data:resume_data
+    }
+    catch(err){
+        return res.status(500).json({
+            message:"server error"
+        })
     }
 
-    })
-    res.json(result)
-})
-
-
-router.patch("/api/:userId/resume/:resumeId/save", async (req, res) => {
-    const resume_data = req.body
-
-    const result = await prisma.resume.update({
-        where: {id:req.params["userId"]},
-        data:{
-            userid:req.params["userId"],
-            data:resume_data
-        },
-    })
-    res.json(result)
 
 });
 
-//Logs for the specific jobs
-router.get("/api/jobs/:jobId/logs", async (req, res) => {
-  const { jobId } = req.params;
+router.patch("/api/resume", async (req, res) => {
+    try{
+         let user = req.header("user-id");
+        if(!user || !req.body.data){
+            return res.status(400).json({
+            message:"required data not provided"
+        })
+        }
+        const existing = await prisma.resume.findUnique({
+        where: { userid: user }
+        });
 
-  try {
-    const logs = await prisma.log.findMany({
-      where: { jobid: jobId },
-      orderBy: { id: "desc" }, // optional
-    });
+        if (!existing) {
+        await prisma.resume.create({
+            data: { userid: user, data: req.body.data }
+        });
+    }
+         await prisma.resume.update({
+            where:{
+                userid:user
+            },
+            data:{
+                userid:user,
+                data:req.body.data
+            }
+        })
 
-    res.json(logs);
-  } catch (error) {
-    res.status(500).json({ error: "Failed to fetch logs" });
-  }
+        return res.status(200).json({
+            message:"resume updated succesfully"
+        })
+        
+
+
+    }
+    catch(err){
+        console.log(err)
+        return res.status(500).json({
+            message:"server error"
+        })
+    }
+
+
 });
 
-router.post("/api/jobs/:jobId/logs", async (req, res) => {
-  const { jobId } = req.params;
-  const { title, desc } = req.body;
+router.get("/api/logs/:id", async (req, res) => {
+    try{
+       let user = req.header("user-id");
+        if(!user){
+            return res.status(400).json({
+            message:"required data not provided"
+        })
 
-  if (!title) {
-    return res.status(400).json({ error: "Title is required" });
-  }
+        }
 
-  try {
-    const log = await prisma.log.create({
-      data: {
-        jobid: jobId,
-        title,
-        desc,
-      },
-    });
+        const logs = await prisma.job.findFirst({
+            where:{
+                id:req.params.id,
+                userid: user 
+            },
+            include:{
+                Logs:true
+            }
+        })
 
-    res.status(201).json(log);
-  } catch (error) {
-    res.status(500).json({ error: "Failed to create log" });
-  }
+        return res.status(200).json({
+            logs:logs,
+            message:"logs fetched succesfully"
+        })
+
+
+    }
+    catch(err){
+        return res.status(500).json({
+            message:"server error"
+        })
+    }
+
+
+
 });
 
-router.delete("/api/logs/:logId", async (req, res) => {
-  const { logId } = req.params;
+router.post("/api/logs", async (req, res) => {
+    try{
+       let user = req.header("user-id");
+        if(!user || !req.body.jobid || !req.body.title){
+            return res.status(400).json({
+            message:"required data not provided"
+        })
 
-  try {
-    await prisma.log.delete({
-      where: { id: logId },
-    });
+        }
 
-    res.json({ message: "Log deleted" });
-  } catch (error) {
-    res.status(500).json({ error: "Failed to delete log" });
-  }
+        const logs = await prisma.log.create({
+            data:{
+                jobid:req.body.jobid,
+                title:req.body.title,
+                desc:req.body.desc? req.body.desc:null
+            }
+        })
+
+        return res.status(200).json({
+            logs:logs.id,
+            message:"logs created succesfully"
+        })
+
+
+    }
+    catch(err){
+        return res.status(500).json({
+            message:"server error"
+        })
+    }
+
+
+    
+});
+
+router.delete("/api/logs", async (req, res) => {
+    try{
+        let user = req.header("user-id");
+        if(!user || !req.body.id){
+            return res.status(400).json({
+            message:"required data not provided"
+        })
+
+        }
+
+        const logs = await prisma.log.delete({
+            where:{
+                id:req.body.id
+            },
+            
+        })
+
+        return res.status(200).json({
+            message:"logs deleted succesfully"
+        })
+
+
+    }
+    catch(err){
+        console.log(err)
+        return res.status(500).json({
+            message:"server error"
+        })
+    }
+
 });
 
 export default router;
