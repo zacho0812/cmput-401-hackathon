@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "node tests/notificationService.test.js",
     "dev": "node index.js"
   },
   "type": "module",
@@ -12,11 +12,15 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "express": "^5.2.1"
+    "cors": "^2.8.5",
+    "express": "^5.2.1",
+    "nodemailer": "^7.0.12",
+    "twilio": "^5.11.2"
   },
   "devDependencies": {
     "@prisma/client": "^7.2.0",
     "dotenv": "^17.2.3",
+    "jest": "^30.2.0",
     "prisma": "^7.2.0"
   }
 }
