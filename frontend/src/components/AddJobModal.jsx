@@ -1,10 +1,14 @@
 import { useEffect, useState } from 'react'
 
+function todayYYYYMMDD() {
+  return new Date().toISOString().slice(0, 10) // e.g. "2026-01-17"
+}
+
 export default function AddJobModal({ open, onClose, onAdd }) {
   const [position, setPosition] = useState('')
   const [company, setCompany] = useState('')
   const [location, setLocation] = useState('')
-  const [deadline, setDeadline] = useState('')
+  const [dateApplied, setDateApplied] = useState(todayYYYYMMDD())
   const [notes, setNotes] = useState('')
   const [status, setStatus] = useState('Not Applied')
 
@@ -14,7 +18,7 @@ export default function AddJobModal({ open, onClose, onAdd }) {
       setPosition('')
       setCompany('')
       setLocation('')
-      setDeadline('')
+      setDateApplied(todayYYYYMMDD()) // ✅ default to today's date
       setNotes('')
       setStatus('Not Applied')
     }
@@ -35,7 +39,7 @@ export default function AddJobModal({ open, onClose, onAdd }) {
       position: position.trim(),
       company: company.trim(),
       location: location.trim(),
-      deadline: deadline || '',
+      dateApplied: dateApplied || '', 
       notes: notes.trim(),
       status,
     })
@@ -110,12 +114,13 @@ export default function AddJobModal({ open, onClose, onAdd }) {
             />
           </label>
 
+          {/*  Date Applied (real date picker) */}
           <label>
-            <div style={{ fontWeight: 700, marginBottom: 4 }}>Deadline</div>
+            <div style={{ fontWeight: 700, marginBottom: 4 }}>Date Applied</div>
             <input
               type="date"
-              value={deadline}
-              onChange={(e) => setDeadline(e.target.value)}
+              value={dateApplied}
+              onChange={(e) => setDateApplied(e.target.value)}
               style={inputStyle}
             />
           </label>
@@ -158,6 +163,7 @@ export default function AddJobModal({ open, onClose, onAdd }) {
 
 const inputStyle = {
   width: '100%',
+  boxSizing: 'border-box',
   padding: 10,
   borderRadius: 10,
   border: '1px solid #ddd',
