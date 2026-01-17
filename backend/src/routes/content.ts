@@ -183,12 +183,21 @@ router.patch("/api/resume", async (req, res) => {
             message:"required data not provided"
         })
         }
+        const existing = await prisma.resume.findUnique({
+        where: { userid: user }
+        });
 
+        if (!existing) {
+        await prisma.resume.create({
+            data: { userid: user, data: req.body.data }
+        });
+    }
          await prisma.resume.update({
             where:{
                 userid:user
             },
             data:{
+                userid:user,
                 data:req.body.data
             }
         })
@@ -201,6 +210,7 @@ router.patch("/api/resume", async (req, res) => {
 
     }
     catch(err){
+        console.log(err)
         return res.status(500).json({
             message:"server error"
         })
@@ -219,9 +229,10 @@ router.get("/api/logs/:id", async (req, res) => {
 
         }
 
-        const logs = await prisma.job.findMany({
+        const logs = await prisma.job.findFirst({
             where:{
-                id:req.params.id
+                id:req.params.id,
+                userid: user 
             },
             include:{
                 Logs:true
@@ -304,6 +315,7 @@ router.delete("/api/logs", async (req, res) => {
 
     }
     catch(err){
+        console.log(err)
         return res.status(500).json({
             message:"server error"
         })
