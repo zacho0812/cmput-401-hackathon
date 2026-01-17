@@ -12,11 +12,15 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "express": "^5.2.1"
+    "@prisma/adapter-pg": "^7.2.0",
+    "express": "^5.2.1",
+    "pg": "^8.17.1"
   },
   "devDependencies": {
     "@prisma/client": "^7.2.0",
+    "@types/pg": "^8.16.0",
     "dotenv": "^17.2.3",
-    "prisma": "^7.2.0"
+    "prisma": "^7.2.0",
+    "tsx": "^4.21.0"
   }
 }
