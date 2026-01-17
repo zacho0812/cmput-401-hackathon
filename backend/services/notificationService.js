@@ -1,12 +1,10 @@
-// backend/services/notificationService.js
-
 // Email validation using regex
 const isValidEmail = (email) => {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     return emailRegex.test(email);
   };
   
-  // Phone number validation (supports various formats)
+  // Phone number validation
   const isValidPhoneNumber = (phone) => {
     // Remove all non-digit characters
     const cleaned = phone.replace(/\D/g, '');
@@ -23,7 +21,7 @@ const isValidEmail = (email) => {
   const formatPhoneNumber = (phone) => {
     const cleaned = phone.replace(/\D/g, '');
     
-    // If 10 digits, assume North America and add +1
+    // If 10 digits, and add +1
     if (cleaned.length === 10) {
       return `+1${cleaned}`;
     }
@@ -43,8 +41,7 @@ const isValidEmail = (email) => {
       throw new Error('Invalid email address');
     }
   
-    // For development/hackathon: just log the email
-    // In production, you'd use nodemailer with a real email service
+    // just log the email
     console.log('📧 EMAIL SENT:');
     console.log('To:', to);
     console.log('Subject:', subject);
@@ -98,7 +95,7 @@ const isValidEmail = (email) => {
   
     const formattedPhone = formatPhoneNumber(to);
   
-    // For development/hackathon: just log the SMS
+    // just log the SMS
     console.log('📱 SMS SENT:');
     console.log('To:', formattedPhone);
     console.log('Message:', message);

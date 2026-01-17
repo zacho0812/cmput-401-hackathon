@@ -1,4 +1,3 @@
-// backend/tests/notificationService.test.js
 import {
     isValidEmail,
     isValidPhoneNumber,
