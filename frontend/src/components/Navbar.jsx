@@ -1,4 +1,3 @@
-// src/components/Navbar.jsx
 import { NavLink } from 'react-router-dom'
 
 const linkStyle = ({ isActive }) => ({
@@ -27,6 +26,11 @@ export default function Navbar() {
           <NavLink to="/jobs" style={linkStyle}>
             Job Tracker
           </NavLink>
+
+          <NavLink to="/resume" style={linkStyle}>
+            Master Resume
+          </NavLink>
+
           <NavLink to="/correspondence" style={linkStyle}>
             Correspondence
           </NavLink>

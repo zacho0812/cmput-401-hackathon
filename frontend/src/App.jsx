@@ -1,7 +1,7 @@
-// src/App.jsx
 import { Routes, Route, Navigate } from 'react-router-dom'
 import Navbar from './components/Navbar'
 import JobTracker from './pages/JobTracker'
+import MasterResume from './pages/MasterResume'
 import Correspondence from './pages/Correspondence'
 
 export default function App() {
@@ -19,6 +19,7 @@ export default function App() {
         <Routes>
           <Route path="/" element={<Navigate to="/jobs" replace />} />
           <Route path="/jobs" element={<JobTracker />} />
+          <Route path="/resume" element={<MasterResume />} />
           <Route path="/correspondence" element={<Correspondence />} />
         </Routes>
       </div>
