@@ -174,6 +174,17 @@ export default function AddJobModal({
             />
           </label>
 
+          {/*  Deadline (real date picker) */}
+          <label>
+            <div style={{ fontWeight: 700, marginBottom: 4 }}>Deadline</div>
+            <input
+              type="date"
+              value={deadline}
+              onChange={(e) => setDeadline(e.target.value)}
+              style={inputStyle}
+            />
+          </label>
+
           <label>
             <div style={{ fontSize: 32, fontWeight: 900 }}>Status</div>
             <select value={status} onChange={(e) => setStatus(e.target.value)} style={inputStyle}>
