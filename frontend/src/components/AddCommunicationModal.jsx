@@ -145,6 +145,7 @@ const input = {
   borderRadius: 10,
   border: '1px solid #ddd',
   outline: 'none',
+  boxSizing: 'border-box',
 }
 
 const footer = {
