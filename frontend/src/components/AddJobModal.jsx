@@ -9,6 +9,7 @@ export default function AddJobModal({ open, onClose, onAdd }) {
   const [company, setCompany] = useState('')
   const [location, setLocation] = useState('')
   const [dateApplied, setDateApplied] = useState(todayYYYYMMDD())
+  const [deadline, setDeadline] = useState(todayYYYYMMDD())
   const [notes, setNotes] = useState('')
   const [status, setStatus] = useState('Not Applied')
 
@@ -19,6 +20,7 @@ export default function AddJobModal({ open, onClose, onAdd }) {
       setCompany('')
       setLocation('')
       setDateApplied(todayYYYYMMDD()) // ✅ default to today's date
+      setDeadline(todayYYYYMMDD) // ✅ default to today's date
       setNotes('')
       setStatus('Not Applied')
     }
@@ -40,6 +42,7 @@ export default function AddJobModal({ open, onClose, onAdd }) {
       company: company.trim(),
       location: location.trim(),
       dateApplied: dateApplied || '', 
+      deadline: deadline  || '',
       notes: notes.trim(),
       status,
     })
@@ -121,6 +124,17 @@ export default function AddJobModal({ open, onClose, onAdd }) {
               type="date"
               value={dateApplied}
               onChange={(e) => setDateApplied(e.target.value)}
+              style={inputStyle}
+            />
+          </label>
+
+          {/*  Deadline (real date picker) */}
+          <label>
+            <div style={{ fontWeight: 700, marginBottom: 4 }}>Deadline</div>
+            <input
+              type="date"
+              value={deadline}
+              onChange={(e) => setDeadline(e.target.value)}
               style={inputStyle}
             />
           </label>
