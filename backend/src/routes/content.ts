@@ -72,28 +72,57 @@ router.patch("/api/:userId/resume/:resumeId/save", async (req, res) => {
 
 });
 
-router.get("/api/logs/:id", (req, res) => {
-    const jobId = req.params.jobid;
-    try {
-        const logs = await prisma.log.findMany({
-            where: { jobid: jobId },
-            orderBy: { id: 'asc' } // or another order if needed
-        });
-        res.json(logs);
-    } catch (error) {
-        console.error(error);
-        res.status(500).json({ error: "Failed to fetch logs" });
-    }
+//Logs for the specific jobs
+router.get("/api/jobs/:jobId/logs", async (req, res) => {
+  const { jobId } = req.params;
+
+  try {
+    const logs = await prisma.log.findMany({
+      where: { jobid: jobId },
+      orderBy: { id: "desc" }, // optional
+    });
+
+    res.json(logs);
+  } catch (error) {
+    res.status(500).json({ error: "Failed to fetch logs" });
+  }
 });
 
-router.post("/api/logs/:id", (req, res) => {
+router.post("/api/jobs/:jobId/logs", async (req, res) => {
+  const { jobId } = req.params;
+  const { title, desc } = req.body;
 
+  if (!title) {
+    return res.status(400).json({ error: "Title is required" });
+  }
 
-    
+  try {
+    const log = await prisma.log.create({
+      data: {
+        jobid: jobId,
+        title,
+        desc,
+      },
+    });
+
+    res.status(201).json(log);
+  } catch (error) {
+    res.status(500).json({ error: "Failed to create log" });
+  }
 });
 
-router.delete("/api/logs/:id", (req, res) => {
+router.delete("/api/logs/:logId", async (req, res) => {
+  const { logId } = req.params;
 
+  try {
+    await prisma.log.delete({
+      where: { id: logId },
+    });
+
+    res.json({ message: "Log deleted" });
+  } catch (error) {
+    res.status(500).json({ error: "Failed to delete log" });
+  }
 });
 
 export default router;
