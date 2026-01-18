@@ -53,12 +53,13 @@ router.post("/api/jobs", async (req, res) => {
         const job = await prisma.job.create({
             data:{
                 userid:user,
-                positiontTitle:req.body.positionTitle,
+                positionTitle:req.body.positionTitle,
                 companyName:req.body.companyName,
-                dateapplied:req.body.dateapplied? req.body.dateapplied:null,
+                dateapplied:req.body.dateapplied? req.body.dateapplied:Date.now(),
                 location: req.body.location?req.body.location:null,
                 deadline: req.body.deadline?req.body.deadline:null,
-                notes: req.body.notes?req.body.notes:null
+                notes: req.body.notes?req.body.notes:null,
+                status:req.body.status
             }
         })    
         return res.status(200).json({
@@ -68,6 +69,7 @@ router.post("/api/jobs", async (req, res) => {
 
     }
     catch(err){
+        console.log(err)
         return res.status(500).json({
             message:"server error"
         })
@@ -92,12 +94,13 @@ router.patch("/api/jobs", async (req, res) => {
             where:{id:req.body.jobid},
             data:{
                 userid:user,
-                positiontTitle:req.body.positionTitle,
+                positionTitle:req.body.positionTitle,
                 companyName:req.body.companyName,
                 dateapplied:req.body.dateapplied? req.body.dateapplied:null,
                 location: req.body.location?req.body.location:null,
                 deadline: req.body.deadline?req.body.deadline:null,
-                notes: req.body.notes?req.body.notes:null
+                notes: req.body.notes?req.body.notes:null,
+                status:req.body.status
             }
         })    
 
@@ -107,6 +110,7 @@ router.patch("/api/jobs", async (req, res) => {
 
     }
     catch(err){
+        console.log(err)
         return res.status(500).json({
             message:"server error"
         })

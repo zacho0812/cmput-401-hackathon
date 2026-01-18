@@ -29,7 +29,7 @@ model Job{
   userid String 
   Logs Log[]
   companyName String
-  positiontTitle String
+  positionTitle String
   status JobStatus @default(NOT_APPLIED)
   location String?
   deadline DateTime?
