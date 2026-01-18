@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from 'react'
-import { mockJobs } from '../data/mockJobs'
 import JobCard, { sortJobsForAppliedBox } from '../components/JobCard'
 import AddJobModal from '../components/AddJobModal'
+import axios from "axios"
 
 function Section({ title, children }) {
   return (
@@ -28,14 +28,21 @@ function EditJobModal({ open, job, onClose, onSave }) {
   const [status, setStatus] = useState('Not Applied')
   const [notes, setNotes] = useState('')
 
+  
+
   useEffect(() => {
     if (!open || !job) return
-    setPosition(job.position ?? '')
-    setCompany(job.company ?? '')
+    setPosition(job.positionTitle ?? '')
+    // console.log(job)
+    setCompany(job.companyName ?? '')
     setLocation(job.location ?? '')
-    setDateApplied(job.dateApplied || yyyyMmDdToday())
+    setDateApplied(job.dateapplied || yyyyMmDdToday())
     setStatus(job.status ?? 'Not Applied')
     setNotes(job.notes ?? '')
+
+
+
+
   }, [open, job])
 
   if (!open || !job) return null
@@ -141,11 +148,11 @@ function EditJobModal({ open, job, onClose, onSave }) {
             style={inputStyle}
           >
             <option>Not Applied</option>
-            <option>Applied</option>
-            <option>Interview</option>
-            <option>Offer</option>
-            <option>Accepted</option>
-            <option>Rejected</option>
+            <option>APPLIED</option>
+            <option>INTERVIEW</option>
+            <option>OFFER</option>
+            <option>ACCEPTED</option>
+            <option>REJECTED</option>
           </select>
         </div>
 
@@ -180,10 +187,11 @@ function EditJobModal({ open, job, onClose, onSave }) {
               if (!position.trim() || !company.trim()) return
               onSave({
                 ...job,
-                position: position.trim(),
-                company: company.trim(),
+                jobid: job.id,
+                positionTitle: position.trim(),
+                companyName: company.trim(),
                 location: location.trim(),
-                dateApplied: dateApplied || yyyyMmDdToday(),
+                dateapplied: dateApplied || yyyyMmDdToday(),
                 status,
                 notes: notes,
               })
@@ -208,19 +216,38 @@ function EditJobModal({ open, job, onClose, onSave }) {
 }
 
 export default function JobTracker() {
-  const [jobs, setJobs] = useState(mockJobs)
+  const [jobs, setJobs] = useState([])
   const [isAddOpen, setIsAddOpen] = useState(false)
 
   const [isEditOpen, setIsEditOpen] = useState(false)
   const [editingJob, setEditingJob] = useState(null)
 
-  const offeredJobs = useMemo(() => jobs.filter((j) => j.status === 'Offer'), [jobs])
-  const notAppliedJobs = useMemo(() => jobs.filter((j) => j.status === 'Not Applied'), [jobs])
+  const offeredJobs = useMemo(() => jobs.filter((j) => j.status === 'OFFER'), [jobs])
+  const notAppliedJobs = useMemo(() => jobs.filter((j) => j.status === 'NOT_APPLIED'), [jobs])
 
   const appliedJobs = useMemo(() => {
-    const group = jobs.filter((j) => j.status !== 'Not Applied' && j.status !== 'Offer')
+    const group = jobs.filter((j) => j.status !== 'NOT_APPLIED' && j.status !== 'OFFER')
     return sortJobsForAppliedBox(group)
   }, [jobs])
+
+  useEffect(()=>{
+
+      (async ()=>{
+        const existingId = localStorage.getItem("key");
+        const ensureRes = await axios.post("http://localhost:3000/api/key", {
+          id: existingId,
+        });
+
+        const userId = ensureRes.data.id;
+        localStorage.setItem("key", userId);
+        const jobs = await axios.get("http://localhost:3000/api/jobs",{headers: { "user-id": localStorage.getItem("key") }
+        })
+        setJobs(jobs.data.data[0].jobs)
+     
+      })()
+    
+
+  },[])
 
   function onChangeStatus(id, newStatus) {
     setJobs((prev) => prev.map((j) => (j.id === id ? { ...j, status: newStatus } : j)))
@@ -235,10 +262,25 @@ export default function JobTracker() {
     setIsEditOpen(true)
   }
 
-  function onSaveEdit(updatedJob) {
+  async function onSaveEdit(updatedJob) {
     setJobs((prev) => prev.map((j) => (j.id === updatedJob.id ? updatedJob : j)))
     setIsEditOpen(false)
     setEditingJob(null)
+
+    try{
+      console.log(updatedJob)
+      await axios.patch("http://localhost:3000/api/jobs",updatedJob,{headers: { "user-id": localStorage.getItem("key") }
+        })
+      const jobs = await axios.get("http://localhost:3000/api/jobs",{headers: { "user-id": localStorage.getItem("key") }
+        })
+      setJobs(jobs.data.data[0].jobs)
+
+
+    } catch(err){
+      console.log(err)
+      alert("update failed")
+    }
+
   }
 
   function onDeleteJob(id) {
@@ -310,7 +352,7 @@ export default function JobTracker() {
         ))}
       </Section>
 
-      <AddJobModal open={isAddOpen} onClose={() => setIsAddOpen(false)} onAdd={onAddJob} />
+      <AddJobModal open={isAddOpen} onClose={() => setIsAddOpen(false)} onAdd={onAddJob} setJobs={setJobs}/>
 
       <EditJobModal
         open={isEditOpen}

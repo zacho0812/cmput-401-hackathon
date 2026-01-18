@@ -15,11 +15,11 @@ function badgeStyle(status) {
     fontWeight: 700,
     display: 'inline-block',
   }
-  if (status === 'Applied') return { ...base, background: '#d8f5d8' }
-  if (status === 'Interview') return { ...base, background: '#fff3bf' }
-  if (status === 'Offer') return { ...base, background: '#dbeafe' }
-  if (status === 'Accepted') return { ...base, background: '#bbf7d0' }
-  if (status === 'Rejected') return { ...base, background: '#ffd8a8' }
+  if (status === 'APPLIED') return { ...base, background: '#d8f5d8' }
+  if (status === 'INTERVIEW') return { ...base, background: '#fff3bf' }
+  if (status === 'OFFER') return { ...base, background: '#dbeafe' }
+  if (status === 'ACCEPTED') return { ...base, background: '#bbf7d0' }
+  if (status === 'REJECTED') return { ...base, background: '#ffd8a8' }
   return { ...base, background: '#eee' }
 }
 
@@ -28,6 +28,7 @@ export function sortJobsForAppliedBox(jobs) {
 }
 
 export default function JobCard({ job, onChangeStatus, onEdit, onDelete }) {
+  // console.log(job)
   return (
     <div
       onClick={() => onEdit?.(job)}
@@ -45,13 +46,13 @@ export default function JobCard({ job, onChangeStatus, onEdit, onDelete }) {
       tabIndex={0}
     >
       <div style={{ flex: 1, minWidth: 0 }}>
-        <div style={{ fontWeight: 800 }}>{job.position}</div>
+        <div style={{ fontWeight: 800 }}>{job.positionTitle}</div>
         <div style={{ color: '#444', marginTop: 2 }}>
-          {job.company}
+          {job.companyName}
           {job.location ? <> • {job.location}</> : null}
         </div>
         <div style={{ color: '#666', marginTop: 6 }}>
-          Date Applied: {job.dateApplied || 'N/A'}
+          Date Applied: {job.dateapplied.split("T")[0] || 'N/A'}
           {job.notes ? <> • Notes: {job.notes}</> : null}
         </div>
       </div>
@@ -59,7 +60,7 @@ export default function JobCard({ job, onChangeStatus, onEdit, onDelete }) {
       <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 8 }}>
         <span style={badgeStyle(job.status)}>{job.status}</span>
 
-        <select
+        {/* <select
           value={job.status}
           onClick={(e) => e.stopPropagation()}
           onChange={(e) => onChangeStatus(job.id, e.target.value)}
@@ -71,7 +72,7 @@ export default function JobCard({ job, onChangeStatus, onEdit, onDelete }) {
           <option>Offer</option>
           <option>Accepted</option>
           <option>Rejected</option>
-        </select>
+        </select> */}
 
         <button
           onClick={(e) => {
