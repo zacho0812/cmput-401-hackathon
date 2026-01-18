@@ -1,12 +1,30 @@
-html, body {
+/* src/index.css */
+
+/* Good default so padding/borders don't break widths */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+/* Make the page behave nicely on all screens */
+html,
+body {
   margin: 0;
   padding: 0;
   width: 100%;
-  height: 100%;
+  min-height: 100%;
+  font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
 }
 
+/* Root should fill width (height doesn't need to be forced) */
 #root {
   width: 100%;
-  height: 100%;
+  min-height: 100%;
 }
 
+/* Images should never overflow */
+img {
+  max-width: 100%;
+  height: auto;
+}
