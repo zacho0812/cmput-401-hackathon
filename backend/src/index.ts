@@ -1,8 +1,10 @@
 import express from "express"
 import Content from "./routes/content.js"
 import {PrismaClient} from "@prisma/client"
+import cors from "cors"
 
 const app = express()
+app.use(cors())
 app.use(express.json())
 app.use(Content)
 
