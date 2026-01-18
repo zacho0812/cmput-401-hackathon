@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from 'react'
+import axios from "axios";
 
 export default function AddJobModal({
   open,
@@ -6,7 +7,8 @@ export default function AddJobModal({
 
   // For compatibility with your existing code:
   onAdd,     // used when adding
-  onSave,    // optional, used when editing
+  onSave, 
+  setJobs,   // optional, used when editing
 
   // When you pass a job here, the modal becomes "Edit" mode
   initialJob = null,
@@ -32,17 +34,17 @@ export default function AddJobModal({
   const [location, setLocation] = useState('')
   const [dateApplied, setDateApplied] = useState(todayStr)
   const [notes, setNotes] = useState('')
-  const [status, setStatus] = useState('Not Applied')
+  const [status, setStatus] = useState('NOT APPLIED')
 
   // Reset / prefill form whenever modal opens OR initialJob changes
   useEffect(() => {
     if (!open) return
 
     if (initialJob) {
-      setPosition(initialJob.position || '')
-      setCompany(initialJob.company || '')
+      setPosition(initialJob.positionTitle || '')
+      setCompany(initialJob.companyName || '')
       setLocation(initialJob.location || '')
-      setDateApplied(initialJob.dateApplied || todayStr)
+      setDateApplied(initialJob.dateapplied || todayStr)
       setNotes(initialJob.notes || '')
       setStatus(initialJob.status || 'Not Applied')
     } else {
@@ -57,7 +59,7 @@ export default function AddJobModal({
 
   if (!open) return null
 
-  function handleSubmit(e) {
+  async function handleSubmit(e) {
     e.preventDefault()
 
     if (!position.trim() || !company.trim()) {
@@ -65,23 +67,51 @@ export default function AddJobModal({
       return
     }
 
+
     if (!submitFn) {
       // If you haven’t wired the handler yet, just close
       onClose?.()
       return
     }
 
-    const jobToSubmit = {
-      id: initialJob?.id ?? Date.now(),
-      position: position.trim(),
-      company: company.trim(),
+    const payload = {
+      jobid: initialJob?.id?? null ,
+      positionTitle: position.trim(),
+      companyName: company.trim(),
       location: location.trim(),
-      dateApplied: dateApplied || todayStr,
+      dateapplied: dateApplied ? new Date(dateApplied).toISOString() : null,
       notes: notes, // keep spaces + multi-line (don’t trim hard)
       status,
     }
 
-    submitFn(jobToSubmit)
+    try{
+      if(isEdit){
+        const res= await axios.patch(`http://localhost:3000/api/jobs`,payload,
+          {headers: { "user-id": localStorage.getItem("key") }
+        })
+
+      } else{
+        // console.log(payload)
+        const res= await axios.post(`http://localhost:3000/api/jobs`,payload,
+          {headers: { "user-id": localStorage.getItem("key") }
+        })
+
+      }
+
+      const jobs = await axios.get("http://localhost:3000/api/jobs",{headers: { "user-id": localStorage.getItem("key") }
+        })
+      setJobs(jobs.data.data[0].jobs)
+
+
+
+    } catch(err){
+      console.log(err)
+      alert("job failed")
+
+
+    }
+
+    // submitFn(jobToSubmit)
     onClose?.()
   }
 
@@ -166,12 +196,12 @@ export default function AddJobModal({
           <label>
             <div style={{ fontWeight: 700, marginBottom: 4 }}>Status</div>
             <select value={status} onChange={(e) => setStatus(e.target.value)} style={inputStyle}>
-              <option>Not Applied</option>
-              <option>Applied</option>
-              <option>Interview</option>
-              <option>Offer</option>
-              <option>Accepted</option>
-              <option>Rejected</option>
+              <option>NOT APPLIED</option>
+              <option>APPLIED</option>
+              <option>INTERVIEW</option>
+              <option>OFFER</option>
+              <option>ACCEPTED</option>
+              <option>REJECTED</option>
             </select>
           </label>
 
@@ -189,7 +219,7 @@ export default function AddJobModal({
             <button type="button" onClick={onClose} style={secondaryBtn}>
               Cancel
             </button>
-            <button type="submit" style={primaryBtn}>
+            <button type="submit" style={primaryBtn} >
               {isEdit ? 'Save' : 'Add'}
             </button>
           </div>
