@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import axios from "axios";
 
 export default function AddCommunicationModal({
   open,
@@ -6,7 +7,7 @@ export default function AddCommunicationModal({
   onSave,
   communication,
 }) {
-  const [type, setType] = useState('Email')
+  const [type, setType] = useState('EMAIL')
   const [contact, setContact] = useState('')
   const [notes, setNotes] = useState('')
 
@@ -17,7 +18,7 @@ export default function AddCommunicationModal({
         setContact(communication.contact)
         setNotes(communication.notes)
       } else {
-        setType('Email')
+        setType('EMAIL')
         setContact('')
         setNotes('')
       }
@@ -26,33 +27,61 @@ export default function AddCommunicationModal({
 
   if (!open) return null
 
-  function handleSubmit(e) {
+
+
+  // Handle submitting to backend
+   async function handleSubmit(e) {
     e.preventDefault()
 
     if (!contact.trim()) {
       alert('Please enter a contact or company.')
+      console.log("hello")
       return
     }
 
-    onSave({
-      id: communication?.id ?? Date.now(),
-      type,
+
+    const payload = {
       contact: contact.trim(),
       notes: notes.trim(),
-      time: communication?.time ?? new Date().toLocaleString(),
-    })
+      type: type,
+      //time: communication?.time ?? new Date().toLocaleString(),
+    }
 
-    onClose()
+    
+
+    try{
+
+        const res= await axios.post(`http://localhost:3000/api/logs`,payload,
+          {headers: { "user-id": localStorage.getItem("key") }
+        })
+
+      const logs = await axios.get("http://localhost:3000/api/logs",{headers: { "user-id": localStorage.getItem("key") }
+        })
+
+      const newLog = res.data.logs ?? res.data
+      onSave(newLog)
+
+
+    } catch(err){
+
+      alert("log failed")
+
+
+    }
+    
+
+    // submitFn(jobToSubmit)
+    onClose?.()
   }
 
   return (
-    <div onClick={onClose} style={overlay}>
-      <div onClick={(e) => e.stopPropagation()} style={modal}>
-        <div style={header}>
-          <div style={{ fontSize: 18, fontWeight: 900 }}>
+    <div className="modalOverlay" onClick={onClose}>
+      <div className="modalCard" onClick={(e) => e.stopPropagation()}>
+        <div className="modalHeader">
+          <div className="modalTitle">
             {communication ? 'Edit Communication' : 'Add Communication'}
           </div>
-          <button onClick={onClose} style={closeBtn} aria-label="Close">
+          <button onClick={onClose} className="modalCloseBtn" aria-label="Close" type="button">
             ✕
           </button>
         </div>
@@ -65,11 +94,11 @@ export default function AddCommunicationModal({
               onChange={(e) => setType(e.target.value)}
               style={input}
             >
-              <option>Email</option>
-              <option>Phone</option>
-              <option>In Person</option>
-              <option>LinkedIn</option>
-              <option>Other</option>
+              <option>EMAIL</option>
+              <option>PHONE</option>
+              <option>IN_PERSON</option>
+              <option>LINKEDIN</option>
+              <option>OTHER</option>
             </select>
           </label>
 
@@ -108,41 +137,8 @@ export default function AddCommunicationModal({
 }
 
 /* =======================
-   Styles
+   Styles (kept the same)
    ======================= */
-
-const overlay = {
-  position: 'fixed',
-  inset: 0,
-  background: 'rgba(0,0,0,0.35)',
-  display: 'flex',
-  alignItems: 'center',
-  justifyContent: 'center',
-  padding: 16,
-  zIndex: 9999,
-}
-
-const modal = {
-  background: 'white',
-  width: '100%',
-  maxWidth: 720,
-  borderRadius: 14,
-  padding: 16,
-  border: '1px solid #eee',
-}
-
-const header = {
-  display: 'flex',
-  justifyContent: 'space-between',
-  alignItems: 'center',
-}
-
-const closeBtn = {
-  border: 'none',
-  background: 'transparent',
-  fontSize: 18,
-  cursor: 'pointer',
-}
 
 const form = {
   marginTop: 12,

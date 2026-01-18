@@ -28,12 +28,12 @@ export function sortJobsForAppliedBox(jobs) {
 }
 
 export default function JobCard({ job, onChangeStatus, onEdit, onDelete }) {
-  // console.log(job)
   return (
     <div
       onClick={() => onEdit?.(job)}
+      className="blockCard" /* ✅ adds visible frame from index.css */
       style={{
-        border: '1px solid #eee',
+        /* keep your existing layout styles */
         borderRadius: 12,
         padding: 12,
         display: 'flex',
@@ -52,27 +52,13 @@ export default function JobCard({ job, onChangeStatus, onEdit, onDelete }) {
           {job.location ? <> • {job.location}</> : null}
         </div>
         <div style={{ color: '#666', marginTop: 6 }}>
-          Date Applied: {job.dateapplied.split("T")[0] || 'N/A'}
+          Date Applied: {job.dateapplied.split('T')[0] || 'N/A'}
           {job.notes ? <> • Notes: {job.notes}</> : null}
         </div>
       </div>
 
       <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 8 }}>
         <span style={badgeStyle(job.status)}>{job.status}</span>
-
-        {/* <select
-          value={job.status}
-          onClick={(e) => e.stopPropagation()}
-          onChange={(e) => onChangeStatus(job.id, e.target.value)}
-          style={{ padding: 8, borderRadius: 8, border: '1px solid #ddd', cursor: 'pointer' }}
-        >
-          <option>Not Applied</option>
-          <option>Applied</option>
-          <option>Interview</option>
-          <option>Offer</option>
-          <option>Accepted</option>
-          <option>Rejected</option>
-        </select> */}
 
         <button
           onClick={(e) => {

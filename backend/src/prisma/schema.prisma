@@ -52,7 +52,16 @@ model Log{
   id String @id @default(uuid())
   user User @relation(fields: [userid], references: [id],onDelete: Cascade)
   userid String
-  title String
-  desc String?
+  type    CommType @default(EMAIL)
+  contact String
+  notes   String?
 
+}
+
+enum CommType {
+  EMAIL
+  PHONE
+  IN_PERSON
+  LINKEDIN
+  OTHER
 }

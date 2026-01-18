@@ -26,6 +26,23 @@ export default function MasterResume() {
   const [isEditMasterOpen, setIsEditMasterOpen] = useState(false)
   const [editingCopyId, setEditingCopyId] = useState(null)
 
+  //  responsive flag (phone/tablet)
+  const [isMobile, setIsMobile] = useState(false)
+  useEffect(() => {
+    const mq = window.matchMedia('(max-width: 640px)')
+    const update = () => setIsMobile(mq.matches)
+    update()
+
+    // Safari fallback
+    if (mq.addEventListener) mq.addEventListener('change', update)
+    else mq.addListener(update)
+
+    return () => {
+      if (mq.removeEventListener) mq.removeEventListener('change', update)
+      else mq.removeListener(update)
+    }
+  }, [])
+
   // Load from localStorage
   useEffect(() => {
     const savedMaster = localStorage.getItem(STORAGE_KEY)
@@ -195,23 +212,23 @@ async function downloadCopy(copy) {
 
 
   return (
-    <div>
-      <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', gap: 12 }}>
+    <div style={{ maxWidth: 900, margin: '0 auto' }}>
+      <div style={headerRow}>
         <div>
-          <div style={{ fontSize: 28, fontWeight: 950 }}>Master Resume</div>
+          <div style={titleStyle}>Master Resume</div>
           <div style={{ color: '#666', marginTop: 6 }}>
             Store a master resume template, then create tailored copies by quick edits.
           </div>
         </div>
 
-        <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap', justifyContent: 'flex-end' }}>
+        <div style={actionsWrap}>
           {/* #3 Copy button */}
-          <button style={outlineBtnBlue} onClick={createCopy}>
+          <button style={{ ...outlineBtnBlue, ...(btnFullWidth || {}) }} onClick={createCopy}>
             + Copy Master
           </button>
 
           {/* #4 Download master */}
-          <button style={outlineBtn} onClick={downloadMaster}>
+          <button style={{ ...outlineBtn, ...(btnFullWidth || {}) }} onClick={downloadMaster}>
             Download Master
           </button>
 
@@ -223,13 +240,12 @@ async function downloadCopy(copy) {
       </div>
 
       {/* Quick preview */}
-      <div style={{ marginTop: 18, border: '1px solid #eee', borderRadius: 12, padding: 12 }}>
+      <div style={previewCard}>
         <div style={{ fontSize: 16, fontWeight: 950, marginBottom: 8 }}>Master Preview</div>
-        <div style={{ color: '#333', fontWeight: 900 }}>
-          {master.contact.fullName || '(Your Name)'}
-        </div>
+        <div style={{ color: '#333', fontWeight: 900 }}>{master.contact.fullName || '(Your Name)'}</div>
         <div style={{ color: '#555', marginTop: 4 }}>
-          {[master.contact.email, master.contact.phone, master.contact.location].filter(Boolean).join(' • ') || '(Contact info)'}
+          {[master.contact.email, master.contact.phone, master.contact.location].filter(Boolean).join(' • ') ||
+            '(Contact info)'}
         </div>
         {master.summary ? <div style={{ marginTop: 10, color: '#444' }}>{master.summary}</div> : null}
       </div>
@@ -243,33 +259,22 @@ async function downloadCopy(copy) {
         ) : (
           <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
             {copies.map((c) => (
-              <div
-                key={c.id}
-                style={{
-                  border: '1px solid #eee',
-                  borderRadius: 12,
-                  padding: 12,
-                  display: 'flex',
-                  justifyContent: 'space-between',
-                  alignItems: 'center',
-                  gap: 12,
-                }}
-              >
+              <div key={c.id} style={copyCard}>
                 <div>
                   <div style={{ fontWeight: 950 }}>{c.name}</div>
                   {/* <div style={{ color: '#666', marginTop: 4 }}>Created: {c.createdAt}</div> */}
                 </div>
 
-                <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap', justifyContent: 'flex-end' }}>
-                  <button style={outlineBtn} onClick={() => downloadCopy(c)}>
+                <div style={copyActions}>
+                  <button style={{ ...outlineBtn, ...(btnFullWidth || {}) }} onClick={() => downloadCopy(c)}>
                     Download
                   </button>
 
-                  <button style={outlineBtnBlue} onClick={() => setEditingCopyId(c.id)}>
+                  <button style={{ ...outlineBtnBlue, ...(btnFullWidth || {}) }} onClick={() => setEditingCopyId(c.id)}>
                     Edit
                   </button>
 
-                  {/* <button style={dangerBtn} onClick={() => deleteCopy(c.id)}>
+                  <button style={{ ...dangerBtn, ...(btnFullWidth || {}) }} onClick={() => deleteCopy(c.id)}>
                     Delete
                   </button> */}
                 </div>

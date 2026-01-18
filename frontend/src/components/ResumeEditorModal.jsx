@@ -54,16 +54,15 @@ export default function ResumeEditorModal({ open, title, initialValue, onClose, 
   }
 
   function updateExperienceBullets(index, bulletsText) {
-  // keep EXACT text while typing (do not trim here)
-  const bullets = bulletsText.split('\n')
+    // keep EXACT text while typing (do not trim here)
+    const bullets = bulletsText.split('\n')
 
-  setDraft((prev) => {
-    const next = [...prev.experience]
-    next[index] = { ...next[index], bullets }
-    return { ...prev, experience: next }
-  })
-}
-
+    setDraft((prev) => {
+      const next = [...prev.experience]
+      next[index] = { ...next[index], bullets }
+      return { ...prev, experience: next }
+    })
+  }
 
   function addExperience() {
     setDraft((prev) => ({
@@ -92,38 +91,15 @@ export default function ResumeEditorModal({ open, title, initialValue, onClose, 
   }
 
   return (
-    <div
-      onClick={onClose}
-      style={{
-        position: 'fixed',
-        inset: 0,
-        background: 'rgba(0,0,0,0.35)',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        padding: 16,
-        zIndex: 9999,
-      }}
-    >
-      <div
-        onClick={(e) => e.stopPropagation()}
-        style={{
-          background: 'white',
-          width: '100%',
-          maxWidth: 900,
-          borderRadius: 14,
-          padding: 16,
-          border: '1px solid #eee',
-          maxHeight: '85vh',
-          overflow: 'auto',
-        }}
-      >
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 10 }}>
-          <div style={{ fontSize: 18, fontWeight: 900 }}>{title}</div>
+    <div className="modalOverlay" onClick={onClose}>
+      <div className="modalCard" onClick={(e) => e.stopPropagation()}>
+        <div className="modalHeader">
+          <div className="modalTitle">{title}</div>
           <button
             onClick={onClose}
-            style={{ border: 'none', background: 'transparent', fontSize: 18, cursor: 'pointer' }}
+            className="modalCloseBtn"
             aria-label="Close"
+            type="button"
           >
             ✕
           </button>
@@ -234,11 +210,8 @@ function SectionTitle({ children }) {
 }
 
 function Grid2({ children }) {
-  return (
-    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
-      {children}
-    </div>
-  )
+  // changed to className so it becomes 1-column on mobile via CSS
+  return <div className="formGrid2">{children}</div>
 }
 
 function Field({ label, value, onChange }) {

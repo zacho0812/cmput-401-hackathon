@@ -1,5 +1,6 @@
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import AddCommunicationModal from '../components/AddCommunicationModal'
+import axios from "axios";
 
 function normalizeCompany(name) {
   return (name ?? '').trim().toLowerCase()
@@ -9,6 +10,34 @@ export default function Correspondence() {
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [log, setLog] = useState([])
   const [editingEntry, setEditingEntry] = useState(null)
+
+
+  // add coresspondancec?????
+  useEffect(() => {
+    async function loadLogs() {
+      try {
+        const userId = localStorage.getItem("key")
+
+        if (!userId) {
+          console.warn("No user id found")
+          return
+        }
+
+        const res = await axios.get("http://localhost:3000/api/logs", {
+          headers: { "user-id": userId },
+        })
+
+        // IMPORTANT: match your backend response shape
+        const logs = res.data.logs ?? res.data
+        setLog(logs.slice().reverse())
+
+      } catch (err) {
+        console.error("Failed to load logs:", err)
+      }
+  }
+
+  loadLogs()
+}, [])
 
   // which company groups are expanded
   const [expanded, setExpanded] = useState({})

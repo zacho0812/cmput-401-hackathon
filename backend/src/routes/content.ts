@@ -1,5 +1,6 @@
 import { Router } from "express";
 import {PrismaClient} from "@prisma/client"
+import { CommType } from "@prisma/client";
 import { da } from "zod/locales";
 import { jsonToResumeLatex } from "../utils/json2latex.js";
 import latex from "node-latex";
@@ -262,21 +263,19 @@ router.post("/api/resume", async (req, res) => {
 router.get("/api/logs", async (req, res) => {
     try{
        let user = req.header("user-id");
-        if(!user){
-            return res.status(400).json({
-            message:"required data not provided"
-        })
-
+            if(!user){
+                return res.status(400).json({
+                message:"required data not provided"
+            })
         }
-
-        const logs = await prisma.user.findFirst({
+        
+        const logs = await prisma.log.findMany({
             where:{
-                id:user
+                userid:user,
             },
-            include:{
-                logs:true
-            }
+
         })
+            
 
         return res.status(200).json({
             logs:logs,
@@ -296,27 +295,34 @@ router.get("/api/logs", async (req, res) => {
 });
 
 router.post("/api/logs", async (req, res) => {
+    
     try{
-       let user = req.header("user-id");
-        if(!user || !req.body.jobid || !req.body.title){
+        const { contact, notes, type } = req.body;
+        let user = req.header("user-id");
+    
+        if(!user){
             return res.status(400).json({
-            message:"required data not provided"
-        })
-
+                message:"required data not provided"
+            })
         }
+
 
         const logs = await prisma.log.create({
             data:{
                 userid:user,
-                title:req.body.title,
-                desc:req.body.desc? req.body.desc:null
+                contact,
+                notes,
+                type: type ?? CommType.EMAIL,
             }
         })
+        
+
 
         return res.status(200).json({
-            logs:logs.id,
+            logs:logs,
             message:"logs created succesfully"
         })
+
 
 
     }
