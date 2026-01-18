@@ -42,10 +42,9 @@ export default function AddCommunicationModal({
 
 
     const payload = {
-      id: null,
       contact: contact.trim(),
       notes: notes.trim(),
-      type,
+      type: type,
       //time: communication?.time ?? new Date().toLocaleString(),
     }
 
@@ -97,11 +96,11 @@ export default function AddCommunicationModal({
               onChange={(e) => setType(e.target.value)}
               style={input}
             >
-              <option>Email</option>
-              <option>Phone</option>
-              <option>In Person</option>
-              <option>LinkedIn</option>
-              <option>Other</option>
+              <option>EMAIL</option>
+              <option>PHONE</option>
+              <option>IN_PERSON</option>
+              <option>LINKEDIN</option>
+              <option>OTHER</option>
             </select>
           </label>
 

@@ -259,23 +259,28 @@ router.get("/api/logs", async (req, res) => {
 });
 
 router.post("/api/logs", async (req, res) => {
+    console.log("backend1")
     try{
        let user = req.header("user-id");
+        console.log("backend2")
         if(!user){
             return res.status(400).json({
-            message:"required data not provided"
-        })
-
+                message:"required data not provided"
+            })
         }
+        console.log("backend3")
+
 
         const logs = await prisma.log.create({
             data:{
                 contact:req.body.contact,
-                notes:req.body.notes? req.body.desc:null,
+                //notes:req.body.notes?req.body.notes:null,
                 type:req.body.type,
-                userid:user
+                userid:user,
             }
         })
+
+        console.log("backend4")
 
         return res.status(200).json({
             logs:logs.id,
@@ -283,8 +288,10 @@ router.post("/api/logs", async (req, res) => {
         })
 
 
+
     }
     catch(err){
+        console.log("backend_fail?")
         return res.status(500).json({
             message:"server error"
         })
