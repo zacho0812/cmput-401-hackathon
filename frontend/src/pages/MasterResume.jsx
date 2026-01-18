@@ -210,6 +210,59 @@ async function downloadCopy(copy) {
   URL.revokeObjectURL(url);
 }
 
+// ✅ Responsive styles (computed)
+  const headerRow = {
+    display: 'flex',
+    flexDirection: isMobile ? 'column' : 'row',
+    alignItems: isMobile ? 'stretch' : 'baseline',
+    justifyContent: 'space-between',
+    gap: isMobile ? 12 : 12,
+  }
+
+  const titleStyle = {
+    fontSize: isMobile ? 24 : 28,
+    fontWeight: 950,
+  }
+
+  const actionsWrap = {
+    display: isMobile ? 'grid' : 'flex',
+    gridTemplateColumns: isMobile ? '1fr 1fr' : undefined,
+    gap: 10,
+    justifyContent: isMobile ? 'stretch' : 'flex-end',
+    alignItems: 'center',
+  }
+
+  const btnFullWidth = isMobile ? { width: '100%' } : null
+
+  const previewCard = {
+    marginTop: 18,
+    border: '1px solid #eee',
+    borderRadius: 14,
+    padding: isMobile ? 14 : 12,
+    background: '#fff',
+  }
+
+  const copyCard = {
+    border: '1px solid #eee',
+    borderRadius: 14,
+    padding: 12,
+    display: 'flex',
+    flexDirection: isMobile ? 'column' : 'row',
+    justifyContent: 'space-between',
+    alignItems: isMobile ? 'stretch' : 'center',
+    gap: 12,
+    background: '#fff',
+  }
+
+  const copyActions = {
+    display: isMobile ? 'grid' : 'flex',
+    gridTemplateColumns: isMobile ? '1fr 1fr 1fr' : undefined,
+    gap: 10,
+    justifyContent: isMobile ? 'stretch' : 'flex-end',
+    alignItems: 'center',
+  }
+
+
 
   return (
     <div style={{ maxWidth: 900, margin: '0 auto' }}>
@@ -274,7 +327,7 @@ async function downloadCopy(copy) {
                     Edit
                   </button>
 
-                  <button style={{ ...dangerBtn, ...(btnFullWidth || {}) }} onClick={() => deleteCopy(c.id)}>
+                  {/*<button style={{ ...dangerBtn, ...(btnFullWidth || {}) }} onClick={() => deleteCopy(c.id)}>
                     Delete
                   </button> */}
                 </div>
