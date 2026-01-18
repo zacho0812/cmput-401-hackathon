@@ -21,13 +21,11 @@ export default function Correspondence() {
   }
 
   return (
-    <div>
-      <div style={{ display: 'flex', justifyContent: 'space-between', gap: 12 }}>
+    <div style={page}>
+      <div style={headerRow}>
         <div>
-          <div style={{ fontSize: 28, fontWeight: 950 }}>
-            Correspondence Log
-          </div>
-          <div style={{ color: '#666', marginTop: 6 }}>
+          <div style={title}>Correspondence Log</div>
+          <div style={subtitle}>
             Track communication with recruiters and companies.
           </div>
         </div>
@@ -37,14 +35,7 @@ export default function Correspondence() {
             setEditingEntry(null)
             setIsModalOpen(true)
           }}
-          style={{
-            padding: '10px 14px',
-            borderRadius: 10,
-            border: '2px solid #1f5eff',
-            background: 'white',
-            fontWeight: 900,
-            cursor: 'pointer',
-          }}
+          style={addBtn}
         >
           + Add Communication
         </button>
@@ -52,28 +43,13 @@ export default function Correspondence() {
 
       <div style={{ marginTop: 18 }}>
         {log.length === 0 ? (
-          <div style={{ color: '#777' }}>
-            No communication logged yet.
-          </div>
+          <div style={empty}>No communication logged yet.</div>
         ) : (
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+          <div style={list}>
             {log.map((e) => (
-              <div
-                key={e.id}
-                style={{
-                  border: '1px solid #eee',
-                  borderRadius: 12,
-                  padding: 12,
-                }}
-              >
-                <div
-                  style={{
-                    display: 'flex',
-                    justifyContent: 'space-between',
-                    alignItems: 'center',
-                  }}
-                >
-                  <div style={{ fontWeight: 900 }}>
+              <div key={e.id} style={card}>
+                <div style={cardHeader}>
+                  <div style={cardTitle}>
                     {e.type} — {e.contact}
                   </div>
 
@@ -89,31 +65,20 @@ export default function Correspondence() {
                     </button>
                     <button
                       onClick={() => handleDelete(e.id)}
-                      style={{ ...iconBtn, color: '#c00' }}
+                      style={{ ...iconBtn, color: '#EA8987' }}
                     >
                       Delete
                     </button>
                   </div>
                 </div>
 
-                <div
-                  style={{
-                    marginTop: 6,
-                    whiteSpace: 'pre-wrap',
-                  }}
-                >
-                  {e.notes}
-                </div>
+                {e.notes && (
+                  <div style={notes}>
+                    {e.notes}
+                  </div>
+                )}
 
-                <div
-                  style={{
-                    color: '#888',
-                    marginTop: 8,
-                    fontSize: 12,
-                  }}
-                >
-                  {e.time}
-                </div>
+                <div style={time}>{e.time}</div>
               </div>
             ))}
           </div>
@@ -133,9 +98,86 @@ export default function Correspondence() {
   )
 }
 
+/* =======================
+   Styles (Palette matched)
+   ======================= */
+
+const page = {
+  background: '#F0EEDD',
+}
+
+const headerRow = {
+  display: 'flex',
+  justifyContent: 'space-between',
+  gap: 12,
+  alignItems: 'flex-start',
+}
+
+const title = {
+  fontSize: 28,
+  fontWeight: 950,
+  color: '#376E8C',
+}
+
+const subtitle = {
+  color: '#7D8F9B',
+  marginTop: 6,
+}
+
+const addBtn = {
+  padding: '10px 16px',
+  borderRadius: 10,
+  border: 'none',
+  background: '#81B857',
+  color: 'white',
+  fontWeight: 900,
+  cursor: 'pointer',
+}
+
+const empty = {
+  color: '#7D8F9B',
+}
+
+const list = {
+  display: 'flex',
+  flexDirection: 'column',
+  gap: 10,
+}
+
+const card = {
+  background: 'white',
+  border: '1px solid #C1D2D0',
+  borderRadius: 12,
+  padding: 12,
+}
+
+const cardHeader = {
+  display: 'flex',
+  justifyContent: 'space-between',
+  alignItems: 'center',
+}
+
+const cardTitle = {
+  fontWeight: 900,
+  color: '#376E8C',
+}
+
+const notes = {
+  marginTop: 6,
+  whiteSpace: 'pre-wrap',
+  color: '#376E8C',
+}
+
+const time = {
+  color: '#7D8F9B',
+  marginTop: 8,
+  fontSize: 12,
+}
+
 const iconBtn = {
   border: 'none',
   background: 'transparent',
   fontWeight: 800,
   cursor: 'pointer',
+  color: '#376E8C',
 }

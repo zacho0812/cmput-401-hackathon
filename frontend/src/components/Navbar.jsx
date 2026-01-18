@@ -4,8 +4,8 @@ const linkStyle = ({ isActive }) => ({
   padding: '10px 12px',
   borderRadius: 8,
   textDecoration: 'none',
-  color: isActive ? 'white' : '#222',
-  background: isActive ? '#111' : 'transparent',
+  color: isActive ? 'white' : '#376E8C',
+  background: isActive ? '#376E8C' : 'transparent',
 })
 
 export default function Navbar() {

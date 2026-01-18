@@ -1,8 +1,20 @@
+/* ===== Global Reset ===== */
+* {
+  box-sizing: border-box;
+}
+
 html, body {
   margin: 0;
   padding: 0;
   width: 100%;
   height: 100%;
+  background: linear-gradient(
+    180deg,
+    #e4d6c5 0%,
+    #78898f 100%
+  );
+  color: #376E8C;
+
 }
 
 #root {
@@ -10,3 +22,25 @@ html, body {
   height: 100%;
 }
 
+/* ===== Links ===== */
+a {
+  color: #376E8C;
+  text-decoration: none;
+  font-weight: 600;
+}
+
+a:hover {
+  text-decoration: underline;
+}
+
+/* ===== Utility ===== */
+.card {
+  background: white;
+  border: 1px solid #C1D2D0;
+  border-radius: 12px;
+  padding: 16px;
+}
+
+.muted {
+  color: #7D8F9B;
+}
