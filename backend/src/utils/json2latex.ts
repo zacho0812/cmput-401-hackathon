@@ -1,4 +1,6 @@
 // jsonToResumeLatex.ts
+// AI-Generated Document (ChatGPT)
+// This document was generated with assistance from ChatGPT.
 
 export type Contact = {
   fullName?: string;
