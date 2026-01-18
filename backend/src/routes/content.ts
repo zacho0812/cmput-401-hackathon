@@ -224,25 +224,22 @@ router.patch("/api/resume", async (req, res) => {
 
 });
 
-router.get("/api/logs/:id", async (req, res) => {
+router.get("/api/logs", async (req, res) => {
     try{
        let user = req.header("user-id");
-        if(!user){
-            return res.status(400).json({
-            message:"required data not provided"
-        })
-
+            if(!user){
+                return res.status(400).json({
+                message:"required data not provided"
+            })
         }
 
-        const logs = await prisma.job.findFirst({
+        
+        const logs = await prisma.log.findMany({
             where:{
-                id:req.params.id,
-                userid: user 
+                userid:user,
             },
-            include:{
-                Logs:true
-            }
         })
+            
 
         return res.status(200).json({
             logs:logs,
@@ -264,7 +261,7 @@ router.get("/api/logs/:id", async (req, res) => {
 router.post("/api/logs", async (req, res) => {
     try{
        let user = req.header("user-id");
-        if(!user || !req.body.jobid || !req.body.title){
+        if(!user){
             return res.status(400).json({
             message:"required data not provided"
         })
@@ -273,9 +270,10 @@ router.post("/api/logs", async (req, res) => {
 
         const logs = await prisma.log.create({
             data:{
-                jobid:req.body.jobid,
-                title:req.body.title,
-                desc:req.body.desc? req.body.desc:null
+                contact:req.body.contact,
+                notes:req.body.notes? req.body.desc:null,
+                type:req.body.type,
+                userid:user
             }
         })
 

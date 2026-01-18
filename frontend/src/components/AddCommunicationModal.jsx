@@ -1,10 +1,12 @@
 import { useEffect, useState } from 'react'
+import axios from "axios";
 
 export default function AddCommunicationModal({
   open,
   onClose,
   onSave,
   communication,
+  setLog,           //Add fetch logs
 }) {
   const [type, setType] = useState('Email')
   const [contact, setContact] = useState('')
@@ -26,23 +28,53 @@ export default function AddCommunicationModal({
 
   if (!open) return null
 
-  function handleSubmit(e) {
+
+
+  // Handle submitting to backend
+   async function handleSubmit(e) {
     e.preventDefault()
 
     if (!contact.trim()) {
       alert('Please enter a contact or company.')
+      console.log("hello")
       return
     }
 
-    onSave({
-      id: communication?.id ?? Date.now(),
-      type,
+
+    const payload = {
+      id: null,
       contact: contact.trim(),
       notes: notes.trim(),
-      time: communication?.time ?? new Date().toLocaleString(),
-    })
+      type,
+      //time: communication?.time ?? new Date().toLocaleString(),
+    }
 
-    onClose()
+    
+
+    try{
+        console.log("hello0")
+        const res= await axios.post(`http://localhost:3000/api/logs`,payload,
+          {headers: { "user-id": localStorage.getItem("key") }
+        })
+        console.log("hello1")
+
+
+      const logs = await axios.get("http://localhost:3000/api/logs",{headers: { "user-id": localStorage.getItem("key") }
+        })
+      setLog(logs.data.data[0].logs)          //not sure about this
+      console.log("hello2")
+
+
+    } catch(err){
+      console.log(err)
+      alert("log failed")
+
+
+    }
+    
+
+    // submitFn(jobToSubmit)
+    onClose?.()
   }
 
   return (
