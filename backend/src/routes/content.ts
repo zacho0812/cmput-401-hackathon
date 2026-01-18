@@ -2,6 +2,10 @@ import { Router } from "express";
 import {PrismaClient} from "@prisma/client"
 import { CommType } from "@prisma/client";
 import { da } from "zod/locales";
+import { jsonToResumeLatex } from "../utils/json2latex.js";
+import latex from "node-latex";
+import { JsxEmit } from "typescript";
+import fs from "fs";
 
 const router = Router();
 
@@ -363,6 +367,55 @@ router.delete("/api/logs", async (req, res) => {
     }
 
 });
+
+
+router.post("/api/resume/pdf",async (req,res)=>{
+     try{
+        let user = req.header("user-id");
+        if(!user ){
+            return res.status(400).json({
+            message:"required data not provided"
+        })
+
+        }
+        res.setHeader("Content-Type", "application/pdf");
+        res.setHeader(
+        "Content-Disposition",
+        "attachment; filename=resume.pdf"
+        );
+        const json = typeof req.body.data === "string"
+        ? JSON.parse(req.body.data)
+        : req.body.data;
+
+
+        const latexSource = await jsonToResumeLatex(json)
+        
+        await fs.writeFileSync("debug_resume.tex", latexSource, "utf8");
+        //@ts-ignore
+        const pdfStream = await latex(latexSource, {
+        });
+
+        pdfStream.on("error", (err:any) => {
+            console.error("LaTeX compile error:", err);
+            if (!res.headersSent) res.status(500);
+            res.end("LaTeX compile failed");
+        });
+
+        // Stream PDF directly to the response
+        pdfStream.pipe(res);
+        
+
+
+    }
+    catch(err){
+        console.log(err)
+        return res.status(500).json({
+            message:"server error"
+        })
+    }
+
+
+})
 
 
 export default router;

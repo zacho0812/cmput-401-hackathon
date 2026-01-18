@@ -173,66 +173,43 @@ export default function MasterResume() {
     setCopies((prev) => prev.filter((c) => c.id !== id))
   }
 
-  // #4 Download button
-  function downloadMaster() {
-    alert('Download will be added later (backend/PDF not ready yet).')
-  }
+async function downloadMaster() {
+  const res = await axios.post(
+    "http://localhost:3000/api/resume/pdf",
+    { data: master },
+    {
+      headers: { "user-id": localStorage.getItem("key") },
+      responseType: "blob",
+    }
+  );
 
-  function downloadCopy(copy) {
-    alert(`Download for "${copy.name}" will be added later.`)
-  }
+  const url = URL.createObjectURL(res.data);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = "resume-master.pdf";
+  a.click();
+  URL.revokeObjectURL(url);
+}
 
-  // ✅ Responsive styles (computed)
-  const headerRow = {
-    display: 'flex',
-    flexDirection: isMobile ? 'column' : 'row',
-    alignItems: isMobile ? 'stretch' : 'baseline',
-    justifyContent: 'space-between',
-    gap: isMobile ? 12 : 12,
-  }
 
-  const titleStyle = {
-    fontSize: isMobile ? 24 : 28,
-    fontWeight: 950,
-  }
+async function downloadCopy(copy) {
+  const res = await axios.post(
+    "http://localhost:3000/api/resume/pdf",
+    { data: copy.data },
+    {
+      headers: { "user-id": localStorage.getItem("key") },
+      responseType: "blob",
+    }
+  );
 
-  const actionsWrap = {
-    display: isMobile ? 'grid' : 'flex',
-    gridTemplateColumns: isMobile ? '1fr 1fr' : undefined,
-    gap: 10,
-    justifyContent: isMobile ? 'stretch' : 'flex-end',
-    alignItems: 'center',
-  }
+  const url = URL.createObjectURL(res.data);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = `${copy.name || "resume"}.pdf`;
+  a.click();
+  URL.revokeObjectURL(url);
+}
 
-  const btnFullWidth = isMobile ? { width: '100%' } : null
-
-  const previewCard = {
-    marginTop: 18,
-    border: '1px solid #eee',
-    borderRadius: 14,
-    padding: isMobile ? 14 : 12,
-    background: '#fff',
-  }
-
-  const copyCard = {
-    border: '1px solid #eee',
-    borderRadius: 14,
-    padding: 12,
-    display: 'flex',
-    flexDirection: isMobile ? 'column' : 'row',
-    justifyContent: 'space-between',
-    alignItems: isMobile ? 'stretch' : 'center',
-    gap: 12,
-    background: '#fff',
-  }
-
-  const copyActions = {
-    display: isMobile ? 'grid' : 'flex',
-    gridTemplateColumns: isMobile ? '1fr 1fr 1fr' : undefined,
-    gap: 10,
-    justifyContent: isMobile ? 'stretch' : 'flex-end',
-    alignItems: 'center',
-  }
 
   return (
     <div style={{ maxWidth: 900, margin: '0 auto' }}>
