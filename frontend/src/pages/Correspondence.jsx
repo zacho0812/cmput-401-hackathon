@@ -55,8 +55,12 @@ export default function Correspondence() {
     setExpanded((prev) => ({ ...prev, [key]: true }))
   }
 
-  function handleDelete(id) {
-    setLog((prev) => prev.filter((e) => e.id !== id))
+  async function handleDelete(id) {
+    setLog((prev) => prev.filter((l) => l.id !== id))
+    const res = await axios.delete('http://localhost:3000/api/logs',{headers:{ "user-id": localStorage.getItem("key")},data:{
+      id:id
+    }})
+
   }
 
   function toggleCompany(key) {
