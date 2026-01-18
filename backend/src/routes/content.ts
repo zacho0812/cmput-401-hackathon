@@ -159,15 +159,15 @@ router.get("/api/resume", async (req, res) => {
 
         }
 
-        const data = await prisma.resume.findFirst({
+        const data = await prisma.resume.findMany({
             where:{
                 userid:user
             }
         })
 
         return res.status(200).json({
-            data:data?.data,
-            message:"resume fetched succesfully"
+            data:data,
+            message:"resume's fetched succesfully"
         })
 
     }
@@ -180,34 +180,32 @@ router.get("/api/resume", async (req, res) => {
 
 });
 
+
+
+
 router.patch("/api/resume", async (req, res) => {
     try{
          let user = req.header("user-id");
-        if(!user || !req.body.data){
+        if(!user || !req.body.data || !req.body.id){
             return res.status(400).json({
             message:"required data not provided"
         })
         }
-        const existing = await prisma.resume.findUnique({
-        where: { userid: user }
-        });
-
-        if (!existing) {
-        await prisma.resume.create({
-            data: { userid: user, data: req.body.data }
-        });
-    }
-         await prisma.resume.update({
+        
+         const id = await prisma.resume.update({
             where:{
-                userid:user
+                userid:user,
+                id:req.body.id
             },
             data:{
                 userid:user,
-                data:req.body.data
+                data:req.body.data,
+                master:req.body.master
             }
         })
 
         return res.status(200).json({
+            id:id,
             message:"resume updated succesfully"
         })
         
@@ -224,7 +222,40 @@ router.patch("/api/resume", async (req, res) => {
 
 });
 
-router.get("/api/logs/:id", async (req, res) => {
+router.post("/api/resume", async (req, res) => {
+    try{
+         let user = req.header("user-id");
+        if(!user || !req.body.data){
+            return res.status(400).json({
+            message:"required data not provided"
+        })
+        }
+
+        const id = await prisma.resume.create({
+            data: { userid: user, data: req.body.data , master: req.body.master}
+        });
+
+
+        return res.status(200).json({
+            id:id,
+            message:"resume updated succesfully"
+        })
+        
+
+
+    }
+    catch(err){
+        console.log(err)
+        return res.status(500).json({
+            message:"server error"
+        })
+    }
+
+
+});
+
+
+router.get("/api/logs", async (req, res) => {
     try{
        let user = req.header("user-id");
         if(!user){
@@ -234,13 +265,12 @@ router.get("/api/logs/:id", async (req, res) => {
 
         }
 
-        const logs = await prisma.job.findFirst({
+        const logs = await prisma.user.findFirst({
             where:{
-                id:req.params.id,
-                userid: user 
+                id:user
             },
             include:{
-                Logs:true
+                logs:true
             }
         })
 
@@ -273,7 +303,7 @@ router.post("/api/logs", async (req, res) => {
 
         const logs = await prisma.log.create({
             data:{
-                jobid:req.body.jobid,
+                userid:user,
                 title:req.body.title,
                 desc:req.body.desc? req.body.desc:null
             }

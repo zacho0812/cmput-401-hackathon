@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from 'react'
 import ResumeEditorModal from '../components/ResumeEditorModal'
 import { downloadJson } from '../utils/download'
+import axios from "axios"
 
 const STORAGE_KEY = 'job-organizer-master-resume'
 const COPIES_KEY = 'job-organizer-resume-copies'
@@ -16,6 +17,7 @@ const defaultMaster = {
 export default function MasterResume() {
   // master resume
   const [master, setMaster] = useState(defaultMaster)
+  const [masterid,setmasterid] = useState('')
 
   // tailored copies
   const [copies, setCopies] = useState([]) // {id, name, data, createdAt}
@@ -42,6 +44,37 @@ export default function MasterResume() {
     localStorage.setItem(COPIES_KEY, JSON.stringify(copies))
   }, [copies])
 
+  useEffect(()=>{
+    (async()=>{
+
+      const res = await axios.get('http://localhost:3000/api/resume',{headers:{ "user-id": localStorage.getItem("key")}})
+      console.log(res)
+      const master = res.data.data.find(x=>(
+        x.master===true
+      ))
+      setMaster(master.data)
+      setmasterid(master.id)
+      
+    })()
+
+  },[])
+
+  useEffect(()=>{
+    (async()=>{
+
+      const res = await axios.get('http://localhost:3000/api/resume',{headers:{ "user-id": localStorage.getItem("key")}})
+      const anyTrue = res.data.data.some(x=>(
+        x.master===true
+      ))
+
+      if(!anyTrue){
+        const res = await axios.post('http://localhost:3000/api/resume',{data:defaultMaster,master:true},{headers:{ "user-id": localStorage.getItem("key")}})
+      }
+      
+    })()
+
+  },[isEditMasterOpen])
+
   const editingCopy = useMemo(() => copies.find((c) => c.id === editingCopyId) || null, [copies, editingCopyId])
 
   // #3 Copy button: create tailored copy from master
@@ -60,11 +93,13 @@ export default function MasterResume() {
     setEditingCopyId(newCopy.id) // open editor for the new copy
   }
 
-  function saveMaster(updated) {
+  async function saveMaster(updated) {
     setMaster(updated)
+    const res = await axios.patch('http://localhost:3000/api/resume',{data:updated,master:true,id:masterid},{headers:{ "user-id": localStorage.getItem("key")}})
+    
   }
 
-  function saveCopy(updatedData) {
+  async function saveCopy(updatedData) {
     setCopies((prev) =>
       prev.map((c) => (c.id === editingCopyId ? { ...c, data: updatedData } : c))
     )
@@ -106,7 +141,7 @@ function downloadCopy(copy) {
           </button>
 
           {/* #5 Edit master */}
-          <button style={primaryBtn} onClick={() => setIsEditMasterOpen(true)}>
+          <button style={primaryBtn} onClick={() => (setIsEditMasterOpen(true))}>
             Edit Master
           </button>
         </div>
