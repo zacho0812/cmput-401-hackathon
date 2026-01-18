@@ -389,7 +389,7 @@ router.post("/api/resume/pdf",async (req,res)=>{
 
 
         const latexSource = await jsonToResumeLatex(json)
-        
+
         await fs.writeFileSync("debug_resume.tex", latexSource, "utf8");
         //@ts-ignore
         const pdfStream = await latex(latexSource, {
