@@ -159,15 +159,15 @@ router.get("/api/resume", async (req, res) => {
 
         }
 
-        const data = await prisma.resume.findFirst({
+        const data = await prisma.resume.findMany({
             where:{
                 userid:user
             }
         })
 
         return res.status(200).json({
-            data:data?.data,
-            message:"resume fetched succesfully"
+            data:data,
+            message:"resume's fetched succesfully"
         })
 
     }
@@ -180,34 +180,32 @@ router.get("/api/resume", async (req, res) => {
 
 });
 
+
+
+
 router.patch("/api/resume", async (req, res) => {
     try{
          let user = req.header("user-id");
-        if(!user || !req.body.data){
+        if(!user || !req.body.data || !req.body.id){
             return res.status(400).json({
             message:"required data not provided"
         })
         }
-        const existing = await prisma.resume.findUnique({
-        where: { userid: user }
-        });
-
-        if (!existing) {
-        await prisma.resume.create({
-            data: { userid: user, data: req.body.data }
-        });
-    }
-         await prisma.resume.update({
+        
+         const id = await prisma.resume.update({
             where:{
-                userid:user
+                userid:user,
+                id:req.body.id
             },
             data:{
                 userid:user,
-                data:req.body.data
+                data:req.body.data,
+                master:req.body.master
             }
         })
 
         return res.status(200).json({
+            id:id,
             message:"resume updated succesfully"
         })
         
@@ -224,6 +222,42 @@ router.patch("/api/resume", async (req, res) => {
 
 });
 
+<<<<<<< HEAD
+=======
+router.post("/api/resume", async (req, res) => {
+    try{
+         let user = req.header("user-id");
+        if(!user || !req.body.data){
+            return res.status(400).json({
+            message:"required data not provided"
+        })
+        }
+
+        const id = await prisma.resume.create({
+            data: { userid: user, data: req.body.data , master: req.body.master}
+        });
+
+
+        return res.status(200).json({
+            id:id,
+            message:"resume updated succesfully"
+        })
+        
+
+
+    }
+    catch(err){
+        console.log(err)
+        return res.status(500).json({
+            message:"server error"
+        })
+    }
+
+
+});
+
+
+>>>>>>> 3491974a0f6b8e6783eab730df154f1e53f91969
 router.get("/api/logs", async (req, res) => {
     try{
        let user = req.header("user-id");
@@ -233,11 +267,21 @@ router.get("/api/logs", async (req, res) => {
             })
         }
 
+<<<<<<< HEAD
         
         const logs = await prisma.log.findMany({
             where:{
                 userid:user,
             },
+=======
+        const logs = await prisma.user.findFirst({
+            where:{
+                id:user
+            },
+            include:{
+                logs:true
+            }
+>>>>>>> 3491974a0f6b8e6783eab730df154f1e53f91969
         })
             
 
@@ -273,10 +317,16 @@ router.post("/api/logs", async (req, res) => {
 
         const logs = await prisma.log.create({
             data:{
+<<<<<<< HEAD
                 contact:req.body.contact,
                 //notes:req.body.notes?req.body.notes:null,
                 type:req.body.type,
                 userid:user,
+=======
+                userid:user,
+                title:req.body.title,
+                desc:req.body.desc? req.body.desc:null
+>>>>>>> 3491974a0f6b8e6783eab730df154f1e53f91969
             }
         })
 
