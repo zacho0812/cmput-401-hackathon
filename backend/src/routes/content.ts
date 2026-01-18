@@ -140,6 +140,7 @@ router.delete("/api/jobs", async (req, res) => {
         })
     }
     catch(err){
+        console.log(err)
         return res.status(500).json({
             message:"server error"
         })

@@ -283,10 +283,13 @@ export default function JobTracker() {
 
   }
 
-  function onDeleteJob(id) {
-  setJobs((prev) => prev.filter((j) => j.id !== id))
-}
+  async function onDeleteJob(id) {
+    setJobs((prev) => prev.filter((j) => j.id !== id))
+    const res = await axios.delete('http://localhost:3000/api/jobs',{headers:{ "user-id": localStorage.getItem("key")},data:{
+      id:id
+    }})
 
+  }
 
   return (
     <div>
