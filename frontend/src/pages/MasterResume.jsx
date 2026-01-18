@@ -41,19 +41,21 @@ export default function MasterResume() {
   }, [master])
 
   useEffect(() => {
-    localStorage.setItem(COPIES_KEY, JSON.stringify(copies))
+    // localStorage.setItem(COPIES_KEY, JSON.stringify(copies))
   }, [copies])
 
   useEffect(()=>{
     (async()=>{
 
       const res = await axios.get('http://localhost:3000/api/resume',{headers:{ "user-id": localStorage.getItem("key")}})
-      console.log(res)
+      // console.log(res)
       const master = res.data.data.find(x=>(
         x.master===true
       ))
       setMaster(master.data)
       setmasterid(master.id)
+
+
       
     })()
 
@@ -70,6 +72,21 @@ export default function MasterResume() {
       if(!anyTrue){
         const res = await axios.post('http://localhost:3000/api/resume',{data:defaultMaster,master:true},{headers:{ "user-id": localStorage.getItem("key")}})
       }
+      // console.log(res.data.data[1].data)
+      let newlist = res.data.data.filter(x=>{
+        if( x.master===false){
+          return x.data
+        }
+      })
+      
+      console.log(newlist)
+
+      newlist = newlist.map(x=>{
+        return x.data
+      })
+      
+
+      setCopies(x=>[...x,...newlist])
       
     })()
 
@@ -78,19 +95,32 @@ export default function MasterResume() {
   const editingCopy = useMemo(() => copies.find((c) => c.id === editingCopyId) || null, [copies, editingCopyId])
 
   // #3 Copy button: create tailored copy from master
-  function createCopy() {
+  async function createCopy() {
     const name = prompt('Name this resume copy (e.g., "Google SWE Intern")')
     if (!name) return
 
+   
+
     const newCopy = {
-      id: Date.now(),
+      id: "",
       name: name.trim(),
       data: JSON.parse(JSON.stringify(master)), // deep copy
       createdAt: new Date().toLocaleString(),
     }
 
-    setCopies((prev) => [newCopy, ...prev])
-    setEditingCopyId(newCopy.id) // open editor for the new copy
+     const res = await axios.post('http://localhost:3000/api/resume',{data:newCopy,master:false},{headers:{ "user-id": localStorage.getItem("key")}})
+
+      const newCopy2 = {
+      id: res.data.id.id,
+      name: name.trim(),
+      data: JSON.parse(JSON.stringify(master)), // deep copy
+      createdAt: new Date().toLocaleString(),
+    }
+     const res2 = await axios.patch('http://localhost:3000/api/resume',{data:newCopy2,master:false,id:res.data.id.id,name:name},{headers:{ "user-id": localStorage.getItem("key")}})
+      
+
+    setCopies((prev) => [newCopy2, ...prev])
+    setEditingCopyId(newCopy2.id) // open editor for the new copy
   }
 
   async function saveMaster(updated) {
@@ -103,6 +133,9 @@ export default function MasterResume() {
     setCopies((prev) =>
       prev.map((c) => (c.id === editingCopyId ? { ...c, data: updatedData } : c))
     )
+    const res2 = await axios.patch('http://localhost:3000/api/resume',{data:{id:editingCopyId,data:updatedData},master:false,id:editingCopyId},{headers:{ "user-id": localStorage.getItem("key")}})
+      
+
   }
 
   function deleteCopy(id) {
@@ -194,9 +227,9 @@ function downloadCopy(copy) {
                     Edit
                   </button>
 
-                  <button style={dangerBtn} onClick={() => deleteCopy(c.id)}>
+                  {/* <button style={dangerBtn} onClick={() => deleteCopy(c.id)}>
                     Delete
-                  </button>
+                  </button> */}
                 </div>
               </div>
             ))}
