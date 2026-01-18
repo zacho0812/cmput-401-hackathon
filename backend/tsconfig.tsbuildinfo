@@ -1,1 +1,1 @@
-{"root":["./src/index.ts","./src/prisma.config.ts","./src/routes/content.ts"],"version":"5.9.3"}
+{"root":["./src/index.ts","./src/prisma.config.ts","./src/routes/content.ts","./src/utils/json2latex.ts"],"version":"5.9.3"}

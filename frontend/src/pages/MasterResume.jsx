@@ -156,14 +156,43 @@ export default function MasterResume() {
     setCopies((prev) => prev.filter((c) => c.id !== id))
   }
 
-  // #4 Download button
-  function downloadMaster() {
-  alert('Download will be added later (backend/PDF not ready yet).')
+async function downloadMaster() {
+  const res = await axios.post(
+    "http://localhost:3000/api/resume/pdf",
+    { data: master },
+    {
+      headers: { "user-id": localStorage.getItem("key") },
+      responseType: "blob",
+    }
+  );
+
+  const url = URL.createObjectURL(res.data);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = "resume-master.pdf";
+  a.click();
+  URL.revokeObjectURL(url);
 }
 
-function downloadCopy(copy) {
-  alert(`Download for "${copy.name}" will be added later.`)
+
+async function downloadCopy(copy) {
+  const res = await axios.post(
+    "http://localhost:3000/api/resume/pdf",
+    { data: copy.data },
+    {
+      headers: { "user-id": localStorage.getItem("key") },
+      responseType: "blob",
+    }
+  );
+
+  const url = URL.createObjectURL(res.data);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = `${copy.name || "resume"}.pdf`;
+  a.click();
+  URL.revokeObjectURL(url);
 }
+
 
   return (
     <div>
