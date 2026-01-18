@@ -6,9 +6,8 @@ export default function AddCommunicationModal({
   onClose,
   onSave,
   communication,
-  setLog,           //Add fetch logs
 }) {
-  const [type, setType] = useState('Email')
+  const [type, setType] = useState('EMAIL')
   const [contact, setContact] = useState('')
   const [notes, setNotes] = useState('')
 
@@ -19,7 +18,7 @@ export default function AddCommunicationModal({
         setContact(communication.contact)
         setNotes(communication.notes)
       } else {
-        setType('Email')
+        setType('EMAIL')
         setContact('')
         setNotes('')
       }
@@ -51,21 +50,20 @@ export default function AddCommunicationModal({
     
 
     try{
-        console.log("hello0")
+
         const res= await axios.post(`http://localhost:3000/api/logs`,payload,
           {headers: { "user-id": localStorage.getItem("key") }
         })
-        console.log("hello1")
-
 
       const logs = await axios.get("http://localhost:3000/api/logs",{headers: { "user-id": localStorage.getItem("key") }
         })
-      setLog(logs.data.data[0].logs)          //not sure about this
-      console.log("hello2")
+
+      const newLog = res.data.logs ?? res.data
+      onSave(newLog)
 
 
     } catch(err){
-      console.log(err)
+
       alert("log failed")
 
 

@@ -1,5 +1,6 @@
 import { Router } from "express";
 import {PrismaClient} from "@prisma/client"
+import { CommType } from "@prisma/client";
 import { da } from "zod/locales";
 
 const router = Router();
@@ -222,8 +223,6 @@ router.patch("/api/resume", async (req, res) => {
 
 });
 
-<<<<<<< HEAD
-=======
 router.post("/api/resume", async (req, res) => {
     try{
          let user = req.header("user-id");
@@ -257,7 +256,6 @@ router.post("/api/resume", async (req, res) => {
 });
 
 
->>>>>>> 3491974a0f6b8e6783eab730df154f1e53f91969
 router.get("/api/logs", async (req, res) => {
     try{
        let user = req.header("user-id");
@@ -266,22 +264,12 @@ router.get("/api/logs", async (req, res) => {
                 message:"required data not provided"
             })
         }
-
-<<<<<<< HEAD
         
         const logs = await prisma.log.findMany({
             where:{
                 userid:user,
             },
-=======
-        const logs = await prisma.user.findFirst({
-            where:{
-                id:user
-            },
-            include:{
-                logs:true
-            }
->>>>>>> 3491974a0f6b8e6783eab730df154f1e53f91969
+
         })
             
 
@@ -303,37 +291,31 @@ router.get("/api/logs", async (req, res) => {
 });
 
 router.post("/api/logs", async (req, res) => {
-    console.log("backend1")
+    
     try{
-       let user = req.header("user-id");
-        console.log("backend2")
+        const { contact, notes, type } = req.body;
+        let user = req.header("user-id");
+    
         if(!user){
             return res.status(400).json({
                 message:"required data not provided"
             })
         }
-        console.log("backend3")
 
 
         const logs = await prisma.log.create({
             data:{
-<<<<<<< HEAD
-                contact:req.body.contact,
-                //notes:req.body.notes?req.body.notes:null,
-                type:req.body.type,
                 userid:user,
-=======
-                userid:user,
-                title:req.body.title,
-                desc:req.body.desc? req.body.desc:null
->>>>>>> 3491974a0f6b8e6783eab730df154f1e53f91969
+                contact,
+                notes,
+                type: type ?? CommType.EMAIL,
             }
         })
+        
 
-        console.log("backend4")
 
         return res.status(200).json({
-            logs:logs.id,
+            logs:logs,
             message:"logs created succesfully"
         })
 
@@ -341,7 +323,6 @@ router.post("/api/logs", async (req, res) => {
 
     }
     catch(err){
-        console.log("backend_fail?")
         return res.status(500).json({
             message:"server error"
         })
