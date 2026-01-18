@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 
-export default function ResumeEditorModal({ open, title, initialValue, onClose, onSave }) {
+export default function ResumeEditorModal({ open, title, initialValue,  id, onClose, onSave }) {
   const [draft, setDraft] = useState(initialValue)
 
   useEffect(() => {
@@ -87,8 +87,9 @@ export default function ResumeEditorModal({ open, title, initialValue, onClose, 
   }
 
   function handleSave() {
-    onSave(draft)
+    onSave(id, draft) 
     onClose()
+
   }
 
   return (

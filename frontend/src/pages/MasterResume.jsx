@@ -8,6 +8,7 @@ const COPIES_KEY = 'job-organizer-resume-copies'
 const API_URL = 'https://api.OOOOYOYOYOYOYOYOY-DATABASEEEEEEEEE.com'
 
 const defaultMaster = {
+  id: 'master-resume-0', // Add this line!
   contact: { fullName: '', email: '', phone: '', location: '', linkedin: '', website: '' },
   summary: '',
   education: [{ school: '', degree: '', start: '', end: '', gpa: '' }],
