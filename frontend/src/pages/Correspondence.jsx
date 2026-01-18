@@ -28,7 +28,8 @@ export default function Correspondence() {
         })
 
         // IMPORTANT: match your backend response shape
-        setLog(res.data.logs ?? res.data)
+        const logs = res.data.logs ?? res.data
+        setLog(logs.slice().reverse())
 
       } catch (err) {
         console.error("Failed to load logs:", err)
