@@ -1,4 +1,5 @@
 /* src/index.css */
+@import "tailwindcss";
 
 /* Good default so padding/borders don't break widths */
 *,
