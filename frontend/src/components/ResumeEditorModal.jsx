@@ -2,25 +2,40 @@ import { useEffect, useState } from 'react'
 
 export default function ResumeEditorModal({ open, title, initialValue,  id, onClose, onSave }) {
   const [draft, setDraft] = useState(initialValue)
+  const [isSaving, setIsSaving] = useState(false);
 
-  useEffect(() => {
+  useEffect(() => { // WORKS WITH OR WITHOUT A DATABASE
     if (open) setDraft(initialValue)
   }, [open, initialValue])
 
   if (!open) return null
 
-  function updateContact(field, value) {
-    setDraft((prev) => ({
+  function updateContact(field, value) { // WORKS WITH OR WITHOUT A DATABASE
+    setDraft((prev) => {
+      // 1. Create the new contact object
+      const updatedContact = { ...prev.contact, [field]: value };
+      
+      // 2. Return the new draft state
+      return {
+        ...prev,
+        contact: updatedContact,
+      };
+    });
+  }
+
+  function updateSection(field, value) { // WORKS WITH OR WITHOUT DATABASE
+  setDraft((prev) => {
+    // Check if the value actually changed to prevent unnecessary re-renders
+    if (prev[field] === value) return prev;
+
+    return {
       ...prev,
-      contact: { ...prev.contact, [field]: value },
-    }))
-  }
+      [field]: value 
+    };
+  });
+}
 
-  function updateSection(field, value) {
-    setDraft((prev) => ({ ...prev, [field]: value }))
-  }
-
-  function updateEducation(index, field, value) {
+  function updateEducation(index, field, value) { // WORKS WITH OR WITHOUT DATABASE
     setDraft((prev) => {
       const next = [...prev.education]
       next[index] = { ...next[index], [field]: value }
@@ -86,10 +101,24 @@ export default function ResumeEditorModal({ open, title, initialValue,  id, onCl
     setDraft((prev) => ({ ...prev, skillsText: value }))
   }
 
-  function handleSave() {
-    onSave(id, draft) 
-    onClose()
-
+  async function handleSave() {
+    setIsSaving(true); // Start loading feedback
+    
+    try {
+      // 1. Trigger the hybrid onSave from the parent. 
+      // This will update state + localStorage immediately (Optimistic).
+      // It will then attempt the HTTPS fetch in the background.
+      await onSave(id, draft); 
+      
+      // 2. Only close the modal if the local save (State/LocalStorage) was successful.
+      onClose();
+    } catch (error) {
+      // 3. Optional: If even the local save fails, you can alert the user here.
+      console.error("Save failed:", error);
+      alert("There was an error saving your changes locally.");
+    } finally {
+      setIsSaving(false); // Stop loading feedback
+    }
   }
 
   return (
@@ -220,8 +249,17 @@ export default function ResumeEditorModal({ open, title, initialValue,  id, onCl
           <button type="button" onClick={onClose} style={secondaryBtn}>
             Cancel
           </button>
-          <button type="button" onClick={handleSave} style={primaryBtn}>
-            Save
+          <button 
+            type="button" 
+            onClick={handleSave} 
+            style={{
+              ...primaryBtn, 
+              opacity: isSaving ? 0.7 : 1, // Look slightly faded when saving
+              cursor: isSaving ? 'not-allowed' : 'pointer'
+            }}
+            disabled={isSaving} // Prevent double-clicks
+          >
+            {isSaving ? 'Saving...' : 'Save'}
           </button>
         </div>
       </div>
