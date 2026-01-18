@@ -19,7 +19,8 @@ enum JobStatus {
 model User{
   id String @id @default(uuid())
   jobs Job[]
-  resume Resume?
+  resume Resume []
+  logs Log[]
 
 }
 
@@ -27,7 +28,6 @@ model Job{
   id String @id @default(uuid()) 
   user User @relation(fields: [userid], references: [id],onDelete: Cascade)
   userid String 
-  Logs Log[]
   companyName String
   positionTitle String
   status JobStatus @default(NOT_APPLIED)
@@ -41,7 +41,8 @@ model Job{
 
 model Resume{
   id String @id @default(uuid())
-  userid String @unique
+  userid String 
+  master Boolean @default(false)
   user User @relation(fields: [userid],references: [id] ,onDelete: Cascade)
   data Json?
 
@@ -49,8 +50,8 @@ model Resume{
 
 model Log{
   id String @id @default(uuid())
-  jobid String
-  job Job @relation(fields: [jobid],references: [id],onDelete: Cascade)
+  user User @relation(fields: [userid], references: [id],onDelete: Cascade)
+  userid String
   title String
   desc String?
 
