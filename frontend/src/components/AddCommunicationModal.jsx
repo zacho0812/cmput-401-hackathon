@@ -46,13 +46,13 @@ export default function AddCommunicationModal({
   }
 
   return (
-    <div onClick={onClose} style={overlay}>
-      <div onClick={(e) => e.stopPropagation()} style={modal}>
-        <div style={header}>
-          <div style={{ fontSize: 18, fontWeight: 900 }}>
+    <div className="modalOverlay" onClick={onClose}>
+      <div className="modalCard" onClick={(e) => e.stopPropagation()}>
+        <div className="modalHeader">
+          <div className="modalTitle">
             {communication ? 'Edit Communication' : 'Add Communication'}
           </div>
-          <button onClick={onClose} style={closeBtn} aria-label="Close">
+          <button onClick={onClose} className="modalCloseBtn" aria-label="Close" type="button">
             ✕
           </button>
         </div>
@@ -108,41 +108,8 @@ export default function AddCommunicationModal({
 }
 
 /* =======================
-   Styles
+   Styles (kept the same)
    ======================= */
-
-const overlay = {
-  position: 'fixed',
-  inset: 0,
-  background: 'rgba(0,0,0,0.35)',
-  display: 'flex',
-  alignItems: 'center',
-  justifyContent: 'center',
-  padding: 16,
-  zIndex: 9999,
-}
-
-const modal = {
-  background: 'white',
-  width: '100%',
-  maxWidth: 720,
-  borderRadius: 14,
-  padding: 16,
-  border: '1px solid #eee',
-}
-
-const header = {
-  display: 'flex',
-  justifyContent: 'space-between',
-  alignItems: 'center',
-}
-
-const closeBtn = {
-  border: 'none',
-  background: 'transparent',
-  fontSize: 18,
-  cursor: 'pointer',
-}
 
 const form = {
   marginTop: 12,
