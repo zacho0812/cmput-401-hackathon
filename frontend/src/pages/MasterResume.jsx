@@ -401,19 +401,18 @@ const downloadCopy = async (copy) => { // WORKS WITH AND WITHOUT DATABASE
 
         <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap', justifyContent: 'flex-end' }}>
           {/* #3 Copy button */}
-          <button style={outlineBtnBlue} onClick={createCopy}>
+          <button style={outlineBtnBlue} onClick={() => createCopy(master.id)}>
             + Copy Master
-          </button>
+            </button>
 
           {/* #4 Download master */}
-          <button style={outlineBtn} onClick={downloadMaster}>
+          <button style={outlineBtn} onClick={() => downloadMaster(master.id)}>
             Download Master
-          </button>
+            </button>
 
           {/* #5 Edit master */}
           <button style={primaryBtn} onClick={() => setIsEditMasterOpen(true)}>
-            Edit Master
-          </button>
+            Edit Master</button>
         </div>
       </div>
 
@@ -456,17 +455,11 @@ const downloadCopy = async (copy) => { // WORKS WITH AND WITHOUT DATABASE
                 </div>
 
                 <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap', justifyContent: 'flex-end' }}>
-                  <button style={outlineBtn} onClick={() => downloadCopy(c)}>
-                    Download
-                  </button>
-
-                  <button style={outlineBtnBlue} onClick={() => setEditingCopyId(c.id)}>
-                    Edit
-                  </button>
-
-                  <button style={dangerBtn} onClick={() => deleteCopy(c.id)}>
-                    Delete
-                  </button>
+                  <button style={outlineBtn} onClick={() => downloadCopy(c)}>Download</button>
+        
+                  <button style={outlineBtnBlue} onClick={() => setEditingCopyId(c.id)}>Edit</button>
+        
+                 <button style={dangerBtn} onClick={() => deleteCopy(c.id)}>Delete</button>
                 </div>
               </div>
             ))}
@@ -475,21 +468,24 @@ const downloadCopy = async (copy) => { // WORKS WITH AND WITHOUT DATABASE
       </div>
 
       {/* #6 Editor form inside modal */}
-      <ResumeEditorModal
-        open={isEditMasterOpen}
-        title="Edit Master Resume"
-        initialValue={master}
-        onClose={() => setIsEditMasterOpen(false)}
-        onSave={saveMaster}
-      />
 
       <ResumeEditorModal
-        open={!!editingCopyId}
-        title={editingCopy ? `Edit Resume Copy: ${editingCopy.name}` : 'Edit Resume Copy'}
-        initialValue={editingCopy ? editingCopy.data : master}
-        onClose={() => setEditingCopyId(null)}
-        onSave={saveCopy}
-      />
+      open={isEditMasterOpen}
+      title="Edit Master Resume"
+      initialValue={master}
+      id={master.id} 
+      onSave={saveMaster}
+      onClose={() => setIsEditMasterOpen(false)}
+    />
+
+    <ResumeEditorModal
+      open={!!editingCopyId}
+      title={editingCopy ? `Edit Resume Copy: ${editingCopy.name}` : 'Edit Resume Copy'}
+      initialValue={editingCopy ? editingCopy.data : master}
+      id={editingCopyId}
+      onSave={saveCopy}
+      onClose={() => setEditingCopyId(null)}
+    />
     </div>
     
   )
