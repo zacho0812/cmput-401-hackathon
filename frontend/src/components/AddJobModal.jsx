@@ -7,7 +7,7 @@ export default function AddJobModal({
 
   // For compatibility with your existing code:
   onAdd,     // used when adding
-  onSave, 
+  onSave,
   setJobs,   // optional, used when editing
 
   // When you pass a job here, the modal becomes "Edit" mode
@@ -67,7 +67,6 @@ export default function AddJobModal({
       return
     }
 
-
     if (!submitFn) {
       // If you haven’t wired the handler yet, just close
       onClose?.()
@@ -75,7 +74,7 @@ export default function AddJobModal({
     }
 
     const payload = {
-      jobid: initialJob?.id?? null ,
+      jobid: initialJob?.id ?? null,
       positionTitle: position.trim(),
       companyName: company.trim(),
       location: location.trim(),
@@ -84,31 +83,24 @@ export default function AddJobModal({
       status,
     }
 
-    try{
-      if(isEdit){
-        const res= await axios.patch(`http://localhost:3000/api/jobs`,payload,
-          {headers: { "user-id": localStorage.getItem("key") }
+    try {
+      if (isEdit) {
+        await axios.patch(`http://localhost:3000/api/jobs`, payload, {
+          headers: { "user-id": localStorage.getItem("key") }
         })
-
-      } else{
-        // console.log(payload)
-        const res= await axios.post(`http://localhost:3000/api/jobs`,payload,
-          {headers: { "user-id": localStorage.getItem("key") }
+      } else {
+        await axios.post(`http://localhost:3000/api/jobs`, payload, {
+          headers: { "user-id": localStorage.getItem("key") }
         })
-
       }
 
-      const jobs = await axios.get("http://localhost:3000/api/jobs",{headers: { "user-id": localStorage.getItem("key") }
-        })
+      const jobs = await axios.get("http://localhost:3000/api/jobs", {
+        headers: { "user-id": localStorage.getItem("key") }
+      })
       setJobs(jobs.data.data[0].jobs)
-
-
-
-    } catch(err){
+    } catch (err) {
       console.log(err)
       alert("job failed")
-
-
     }
 
     // submitFn(jobToSubmit)
@@ -116,30 +108,8 @@ export default function AddJobModal({
   }
 
   return (
-    <div
-      onClick={onClose}
-      style={{
-        position: 'fixed',
-        inset: 0,
-        background: 'rgba(0,0,0,0.35)',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        padding: 16,
-        zIndex: 9999,
-      }}
-    >
-      <div
-        onClick={(e) => e.stopPropagation()}
-        style={{
-          background: 'white',
-          width: '100%',
-          maxWidth: 520,
-          borderRadius: 14,
-          padding: 16,
-          border: '1px solid #eee',
-        }}
-      >
+    <div className="modalOverlay" onClick={onClose}>
+      <div className="modalCard" onClick={(e) => e.stopPropagation()}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
           <div style={{ fontSize: 18, fontWeight: 900 }}>{isEdit ? 'Edit Job' : 'Add Job'}</div>
           <button
@@ -219,7 +189,7 @@ export default function AddJobModal({
             <button type="button" onClick={onClose} style={secondaryBtn}>
               Cancel
             </button>
-            <button type="submit" style={primaryBtn} >
+            <button type="submit" style={primaryBtn}>
               {isEdit ? 'Save' : 'Add'}
             </button>
           </div>
